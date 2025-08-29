@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 {% load i18n %}
-<html lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+{% load language_switcher %}
+<html lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl" {% endif %}>
 {% load static %}
+
 <head>
     <meta charset="utf-8">
     <title>{% block title %}{% if org_details %}{{ org_details.site_title }}{% else %}HANDS Nepal{% endif %}{% endblock %}</title>
-    <link rel="icon" type="image/png" 
-          href="{{ org_details.logo.url }}">
+    <link rel="icon" type="image/png" href="{{ org_details.logo.url }}">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
     <!-- Google Fonts -->
@@ -29,32 +30,35 @@
 
     <!-- Custom CSS -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
-    
+
     <!-- Language Switcher CSS -->
     <style>
         .language-switcher {
             position: relative;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             margin-left: 15px;
         }
 
         .language-button {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 5px 12px;
-            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
-            color: #333;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
             transition: all 0.3s ease;
+            font-weight: 500;
+            color: #fff;
+            font-size: 14px;
         }
 
-        .language-button:hover {
-            background: #e9ecef;
-            border-color: #ced4da;
+        .language-button:hover,
+        .language-button:focus {
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
         }
 
         .language-dropdown {
@@ -62,57 +66,79 @@
             position: absolute;
             top: 100%;
             right: 0;
+            margin-top: 8px;
             background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            margin-top: 5px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             min-width: 140px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             z-index: 1000;
+            overflow: hidden;
         }
 
         .language-dropdown.show {
             display: block;
+            animation: fadeIn 0.2s ease-out;
         }
 
         .language-option {
-            padding: 8px 15px;
-            cursor: pointer;
+            padding: 10px 16px;
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: background-color 0.2s;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s ease;
         }
 
-        .language-option:hover {
+        .language-option:hover,
+        .language-option:focus {
             background-color: #f8f9fa;
+            text-decoration: none;
+            outline: none;
         }
 
         .language-option.active {
-            background-color: #f1f1f1;
+            background-color: #f0f7ff;
+            color: #0066cc;
             font-weight: 500;
         }
 
         .language-flag {
             width: 20px;
             height: 15px;
-            object-fit: cover;
             border-radius: 2px;
+            object-fit: cover;
         }
 
-        @media (max-width: 768px) {
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 991.98px) {
             .language-switcher {
-                margin: 10px 0;
-                width: 100%;
+                margin-left: 10px;
             }
-            
+
             .language-button {
-                width: 100%;
-                justify-content: center;
+                padding: 6px 10px;
             }
-            
+
+            .language-button span {
+                display: none;
+            }
+
             .language-dropdown {
-                width: 100%;
+                right: 0;
+                left: auto;
+                min-width: 120px;
             }
         }
     </style>
@@ -194,13 +220,23 @@
         }
 
         @keyframes slideIn {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
         }
 
         @keyframes slideOut {
-            from { transform: translateY(0); }
-            to { transform: translateY(-100%); }
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-100%);
+            }
         }
 
         @media (max-width: 991.98px) {
@@ -216,6 +252,7 @@
         }
 
         @media (max-width: 991.98px) {
+
             .bg-danger span,
             .bg-danger i {
                 transform: none !important;
@@ -228,24 +265,24 @@
             display: flex;
             justify-content: center;
             padding: 8px 15px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
             line-height: 1.4;
             flex: 1;
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            text-transform: none; 
+            text-transform: none;
         }
 
         .motto-english {
             width: 30%;
-            background-color: #1947a0; 
+            background-color: #1947a0;
             color: #ffffff;
         }
 
         .motto-nepali {
-            background-color: #e41318; 
+            background-color: #e41318;
             font-family: 'Preeti', sans-serif;
             font-size: 1em;
             letter-spacing: 1px;
@@ -255,18 +292,18 @@
 
         /* Mobile styles */
         @media (max-width: 991.98px) {
-            
+
             .top-bar,
             .topbar-right,
             .motto-item {
                 display: none !important;
             }
-            
+
             .motto-item {
                 font-size: 0.9rem;
                 padding: 6px 10px;
             }
-            
+
             .motto-nepali {
                 font-size: 1em;
             }
@@ -363,20 +400,20 @@
                 margin-left: 0;
                 z-index: 1001;
             }
-            
+
             .language-button {
                 padding: 6px;
                 background: rgba(255, 255, 255, 0.1);
             }
-            
+
             .language-button span {
                 display: none;
             }
-            
+
             .language-button i.bi-chevron-down {
                 display: none;
             }
-            
+
             .language-dropdown {
                 right: 0;
                 left: auto;
@@ -386,9 +423,17 @@
 
         /* Animation for language change */
         @keyframes languageChange {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .language-changing {
@@ -401,15 +446,15 @@
             margin-left: 12px;
         }
 
-         .goog-te-banner-frame {
+        .goog-te-banner-frame {
             display: none !important;
         }
-        
+
         .goog-te-gadget {
             color: transparent !important;
             font-size: 0 !important;
         }
-        
+
         .goog-te-gadget .goog-te-combo {
             margin: 0;
             padding: 6px 10px;
@@ -417,7 +462,7 @@
             border: 1px solid #ccc;
             color: #000 !important;
         }
-        
+
         #google_translate_element {
             display: inline-block;
             position: relative;
@@ -426,15 +471,16 @@
             overflow: hidden;
             vertical-align: top;
         }
-        
+
         .goog-te-menu-frame {
-            z-index: 10000 !important; /* Ensure dropdown appears above other elements */
+            z-index: 10000 !important;
+            /* Ensure dropdown appears above other elements */
         }
-                
+
         body {
             top: 0 !important;
         }
-        
+
         .skiptranslate iframe {
             display: none !important;
         }
@@ -444,22 +490,21 @@
         .goog-te-gadget span {
             display: none !important;
         }
-        
+
         /* Fix for layout shifts caused by Google Translate */
         .goog-tooltip {
             display: none !important;
         }
-        
+
         .goog-tooltip:hover {
             display: none !important;
         }
-        
+
         .goog-text-highlight {
             background-color: transparent !important;
             border: none !important;
             box-shadow: none !important;
         }
-
     </style>
 </head>
 
@@ -476,14 +521,15 @@
     <div class="container-fluid px-0" style="background-color: #1947a0;">
         <div class="row g-0 position-relative">
             <!-- Follow Us - Hidden on mobile, shows on lg and up -->
-            <div class="col-12 col-lg-6 ps-3 ps-lg-5 text-start d-none d-lg-flex py-1" style="background-color: #1947a0;">
+            <div class="col-12 col-lg-6 ps-3 ps-lg-5 text-start d-none d-lg-flex py-1"
+                style="background-color: #1947a0;">
                 <div class="h-100 d-inline-flex align-items-center text-white">
-                    {% if org_details.facebook %}<a class="btn btn-link text-light"
-                        href="{{ org_details.facebook }}"><i class="fab fa-facebook-f"></i></a>{% endif %}
-                    {% if org_details.twitter %}<a class="btn btn-link text-light"
-                        href="{{ org_details.twitter }}"><i class="fab fa-twitter"></i></a>{% endif %}
-                    {% if org_details.linkedin %}<a class="btn btn-link text-light"
-                        href="{{ org_details.linkedin }}"><i class="fab fa-linkedin-in"></i></a>{% endif %}
+                    {% if org_details.facebook %}<a class="btn btn-link text-light" href="{{ org_details.facebook }}"><i
+                            class="fab fa-facebook-f"></i></a>{% endif %}
+                    {% if org_details.twitter %}<a class="btn btn-link text-light" href="{{ org_details.twitter }}"><i
+                            class="fab fa-twitter"></i></a>{% endif %}
+                    {% if org_details.linkedin %}<a class="btn btn-link text-light" href="{{ org_details.linkedin }}"><i
+                            class="fab fa-linkedin-in"></i></a>{% endif %}
                     {% if org_details.instagram %}<a class="btn btn-link text-light"
                         href="{{ org_details.instagram }}"><i class="fab fa-instagram"></i></a>{% endif %}
                 </div>
@@ -492,40 +538,27 @@
                 </div>
             </div>
 
-<!-- Phone Section - 3 columns on lg+ -->
-<div class="col-12 col-lg-6 text-center text-lg-end p-0 ms-auto" style="background-color: #e41318;">
-    <div class="h-100 topbar-right d-inline-flex align-items-center text-white py-2 pe-3">
-        <div class="motto-item motto-nepali d-flex align-items-center justify-content-center">
-            <div> "सम्मानित र समृद्ध जीवनका लागि सामुदायिक शसक्तिकरण" </div>
-        </div>
-        <!-- <span class="fs-5 fw-bold me-2"><i class="fa fa-phone-alt me-2"></i>Call Us:</span> -->
-        <span class="fs-5 fw-bold" style="margin-left: 50px;">{{ org_details.phone }}</span>
-    </div>
-    
-    <!-- Modern Language Switcher -->
-    <div class="language-switcher">
-        <!-- ADD ID HERE -->
-        <button class="language-button" id="languageToggle">
-            <i class="bi bi-globe-americas"></i>
-            <span class="current-language">English</span>
-            <i class="bi bi-chevron-down"></i>
-        </button>
-        
-        <!-- ADD ID HERE -->
-        <div class="language-dropdown" id="languageDropdown">
-            <div class="language-option active" data-lang="en">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIj48cGF0aCBmaWxsPSIjMDEyMTY1IiBkPSJNMCAwaDYwdjMwSDB6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGwzMCAxNUY2MCAzMEwzMCAxNUY2MCAwTDMwIDE1TDAgMHoiLz48cGF0aCBmaWxsPSIjYzYwMDIyIiBkPSJNMzAgMTVMNjAgMEw1MCAwTDMwIDlWMGwtMTAgMTVIMHY0aDEwbDEwIDE1djktMjB2OWwyMCAxMGg0MHYtNEwzMCAxNXoiLz48L3N2Zz4=" alt="English" class="language-flag">
-                English
+            <!-- Phone Section - 3 columns on lg+ -->
+            <div class="col-12 col-lg-6 text-center text-lg-end p-0 ms-auto" style="background-color: #e41318;">
+                <div class="h-100 topbar-right d-flex align-items-center justify-content-end text-white py-2 pe-3">
+                    <div class="motto-item motto-nepali d-flex align-items-center me-3">
+                        <div> "सम्मानित र समृद्ध जीवनका लागि सामुदायिक शसक्तिकरण" </div>
+                    </div>
+                    <!-- Phone Number -->
+                    <span class="fs-5 fw-bold">
+                        <i class="fa fa-phone-alt me-2"></i>{{ org_details.phone }}
+                    </span>
+                    
+                    <!-- Language Switcher -->
+                    <div class="me-3">
+                        {% language_switcher %}
+                    </div>
+                    
+                 
+                </div>
             </div>
-            <div class="language-option" data-lang="ne">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMCAwaDYwdjMwSDB6Ii8+PHBhdGggZmlsbD0iI2RjMDAwMCIgZD0iTTAgMGw2MCAzMFYwSDB6Ii8+PHBhdGggZmlsbD0iIzAwMDA4OCIgZD0iTTAgMGw2MCAzMEgweiIvPjxnIGZpbGw9IiMwMDAwODgiPjxjaXJjbGUgY3g9IjMwIiBjeT0iMTUiIHI9IjciLz48Y2lyY2xlIGN4PSIzMCIgY3k9IjE1IiByPSI0IiBmaWxsPSIjZmZmIi8+PGcgZmlsbD0iI2RjMDAwMCI+PHBhdGggZD0iTTMwIDRsMi45IDkuMUw0MiA5LjRsLTcuNCA1LjQgMi45IDkuMUwzMCAxOC44bC03LjQgNS40IDIuOS05LjFMMTggOS40bDkuMS0yLjl6Ii8+PC9nPjwvZz48L3N2Zz4=" alt="Nepali" class="language-flag">
-                नेपाली
-            </div>
-        </div>
-    </div>
-</div>
 
-<div id="google_translate_element" style="position:absolute; left:-9999px;"></div>
+            <div id="google_translate_element" style="position:absolute; left:-9999px;"></div>
         </div>
     </div>
     <!-- Topbar End -->
@@ -559,7 +592,8 @@
 
                         <div class="admin-links">
                             <small class="text-muted">
-                                <a href="{% url 'dashboard_home' %}" class="text-decoration-none text-muted">Admin Login | Dashboard</a>
+                                <a href="{% url 'dashboard_home' %}" class="text-decoration-none text-muted">Admin Login
+                                    | Dashboard</a>
                             </small>
                         </div>
                     </div>
@@ -582,7 +616,8 @@
                     <a href="{% url 'reports' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Reports</a>
                     <a href="{% url 'video' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Video</a>
                     <a href="{% url 'photo' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Photo</a>
-                    <a href="{% url 'notice_list' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">News & Notices</a>
+                    <a href="{% url 'notice_list' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">News &
+                        Notices</a>
                     <a href="{% url 'career_list' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Careers</a>
                     <a href="{% url 'contact' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Contact</a>
                 </div>
@@ -668,7 +703,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    
+
                     {% if org_details.address %}
                     <div class=" mb-2"><i class="fa fa-map-marker-alt me-3"></i>{{ org_details.address }}</div>
                     {% endif %}
@@ -677,7 +712,7 @@
                     {% endif %}
                     {% if org_details.email %}
                     <p class="mb-2"><i class="fa fa-envelope me-3"></i>{{ org_details.email }}</p>
-                    {% endif %}             
+                    {% endif %}
                 </div>
                 <div class="col-lg-3 col-md-6 ps-2 pe-2">
                     <h3 class="text-white mb-4">Quick Links</h3>
@@ -704,8 +739,8 @@
                     <form method="post" action="{% url 'subscribe_newsletter' %}">
                         {% csrf_token %}
                         <div class="position-relative w-100">
-                            <input class="form-control bg-transparent w-100 py-3 ps-4 pe-5" name="email"
-                                type="email" placeholder="Your email" required>
+                            <input class="form-control bg-transparent w-100 py-3 ps-4 pe-5" name="email" type="email"
+                                placeholder="Your email" required>
                             <button type="submit" class="btn py-2 position-absolute top-0 end-0 mt-2 me-2"
                                 style="background-color: #e41318; color: white;">SignUp</button>
                         </div>
@@ -719,8 +754,11 @@
     <!-- Copyright -->
     <div class="container-fluid copyright bg-dark py-4">
         <div class="container text-center">
-            <span class="mb-2">  <a class="fw-semi-bold" style="color:white" href="#">{% if org_details %}{{ org_details.site_title }}{% else %}HandsNepal{% endif %}</a>. All Rights Reserved.</span>
-            <span class="mb-0 ps-3">Design by <a class="fw-semi-bold" style="color:white" href="https://www.kitwosd.com/" target="_blank" rel="noopener noreferrer">Kitwosd IT Support Center</a></span>
+            <span class="mb-2"> <a class="fw-semi-bold" style="color:white" href="#">{% if org_details %}{{
+                    org_details.site_title }}{% else %}HandsNepal{% endif %}</a>. All Rights Reserved.</span>
+            <span class="mb-0 ps-3">Design by <a class="fw-semi-bold" style="color:white"
+                    href="https://www.kitwosd.com/" target="_blank" rel="noopener noreferrer">Kitwosd IT Support
+                    Center</a></span>
         </div>
     </div>
 
@@ -748,288 +786,277 @@
         </div>
     </div>
 
- <!-- JS Libraries -->
+    <!-- JS Libraries -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'lib/wow/wow.min.js' %}"></script>
     <script src="{% static 'lib/easing/easing.min.js' %}"></script>
     <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
     <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
-    
-    <!-- Language Switcher JS -->
+
+    <!-- Language Switcher JavaScript is loaded from static file -->
     <script src="{% static 'js/language-switcher.js' %}"></script>
     <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
 
     <!-- Custom JS -->
     <script src="{% static 'js/main.js' %}"></script>
 
-    <!-- Google Translate Script - MOVED TO BOTTOM -->
-    <script type="text/javascript">
-        function googleTranslateElementInit() {
-            console.log('Google Translate initializing...');
-            new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                includedLanguages: 'en,ne',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                autoDisplay: false
-            }, 'google_translate_element');
-            
-            // Hide Google branding after a short delay
-            setTimeout(hideGoogleTranslateUI, 1000);
-        }
-        
-        function hideGoogleTranslateUI() {
-            // Hide the Google Translate banner
-            const googleBanner = document.querySelector('.goog-te-banner-frame');
-            if (googleBanner) {
-                googleBanner.style.display = 'none';
-            }
-            
-            // Hide the "Translate by Google" text
-            const googleText = document.querySelector('.goog-te-gadget');
-            if (googleText) {
-                googleText.style.color = 'transparent';
-                googleText.style.fontSize = '0';
-            }
-            
-            // Hide the Google Translate attribution
-            const googleLinks = document.querySelectorAll('a.goog-logo-link');
-            googleLinks.forEach(link => {
-                link.style.display = 'none';
-            });
-            
-            const googleFooter = document.querySelector('.goog-te-footer');
-            if (googleFooter) {
-                googleFooter.style.display = 'none';
-            }
-        }
-    </script>
-
-    <!-- Load Google Translate AFTER the function is defined -->
-    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    {% load static %}
+    {% load i18n %}
+    {% load language_switcher %}
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM fully loaded and parsed');
-        
-        // Add IDs to your HTML elements if they don't have them
-        const languageToggle = document.getElementById('languageToggle');
-        const languageDropdown = document.getElementById('languageDropdown');
-        const currentLanguage = document.querySelector('.current-language');
-        const languageOptions = document.querySelectorAll('.language-option');
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM fully loaded');
 
-        // Toggle dropdown visibility
-        if (languageToggle && languageDropdown) {
-            languageToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                languageDropdown.classList.toggle('active');
-            });
-        }
+            // Notice rotation functionality
+            const noticeContainer = document.querySelector('.notice-container');
+            const noticeItems = document.querySelectorAll('.notice-item');
+            let currentIndex = 0;
+            let rotationTimer = null;
+            const rotationInterval = 3000; // 3 seconds
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (languageToggle && languageDropdown && 
-                !languageToggle.contains(e.target) && !languageDropdown.contains(e.target)) {
-                languageDropdown.classList.remove('active');
+            // Show first notice
+            if (noticeItems.length > 0) {
+                noticeItems[0].classList.add('active');
             }
-        });
 
-        // Function to change language
-        function changeLanguage(lang) {
-            console.log('Changing language to:', lang);
-            
-            // Check if Google Translate is loaded
-            if (typeof google !== 'undefined' && google.translate) {
-                var select = document.querySelector('.goog-te-combo');
-                if (select) {
-                    select.value = lang;
-                    // Create a proper change event
-                    var event = new Event('change', { bubbles: true });
-                    select.dispatchEvent(event);
-                    console.log('Language changed via Google Translate');
-                    
-                    // Hide UI again after language change
-                    setTimeout(hideGoogleTranslateUI, 500);
-                } else {
-                    console.log('Google Translate select element not found, retrying...');
-                    // If Google Translate select element isn't available yet, try again
-                    setTimeout(() => changeLanguage(lang), 500);
-                }
-            } else {
-                console.log('Google Translate not loaded, retrying...');
-                // If Google Translate isn't loaded, try again after a short delay
-                setTimeout(() => changeLanguage(lang), 500);
-            }
-        }
+            function showNextNotice() {
+                if (noticeItems.length <= 1) return;
 
-        // Handle language selection
-        if (languageOptions.length > 0) {
-            languageOptions.forEach(option => {
-                option.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const lang = this.getAttribute('data-lang');
-                    console.log('Language option clicked:', lang);
+                const currentNotice = noticeItems[currentIndex];
+                currentNotice.classList.remove('active');
+                currentNotice.style.transform = 'translateX(-100%)';
+                currentNotice.style.opacity = '0';
+                    // Notice rotation continues here
 
-                    languageOptions.forEach(opt => opt.classList.remove('active'));
-                    this.classList.add('active');
+                    // Update notice index
+                    currentIndex = (currentIndex + 1) % noticeItems.length;
+                    const nextNotice = noticeItems[currentIndex];
+                    nextNotice.style.transform = 'translateX(100%)';
+                    nextNotice.style.opacity = '0';
+                    nextNotice.classList.add('active');
 
-                    if (currentLanguage) {
-                        currentLanguage.textContent = lang === 'en' ? 'English' : 'नेपाली';
-                    }
+                    // Trigger reflow
+                    void nextNotice.offsetWidth;
 
-                    if (languageToggle) {
-                        languageToggle.classList.add('language-changing');
-                        setTimeout(() => {
-                            languageToggle.classList.remove('language-changing');
-                        }, 400);
-                    }
-
-                    if (languageDropdown) {
-                        languageDropdown.classList.remove('active');
-                    }
-
-                    changeLanguage(lang);
-                });
-            });
-        }
-
-        // Set up a mutation observer to watch for Google Translate elements
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.addedNodes && mutation.addedNodes.length > 0) {
-                    // Check if any added nodes are Google Translate elements
-                    let hasGoogleElements = false;
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === 1) { // Element node
-                            if (node.classList && 
-                                (node.classList.contains('goog-te-banner-frame') || 
-                                 node.classList.contains('goog-te-menu-frame') ||
-                                 node.classList.contains('goog-te-gadget'))) {
-                                hasGoogleElements = true;
+                    // Animate in the next notice
+                    nextNotice.style.transform = 'translateX(0)';
+                    nextNotice.style.opacity = '1';
+                            if (languageToggle && languageDropdown) {
+                                languageToggle.addEventListener('click', function (e) {
+                                    e.stopPropagation();
+                                    languageDropdown.classList.toggle('active');
+                                });
                             }
+
+                            // Close dropdown when clicking outside
+                            document.addEventListener('click', function (e) {
+                                if (languageToggle && languageDropdown &&
+                                    !languageToggle.contains(e.target) && !languageDropdown.contains(e.target)) {
+                                    languageDropdown.classList.remove('active');
+                                }
+                            });
+
+                            // Function to change language
+                            function changeLanguage(lang) {
+                                console.log('Changing language to:', lang);
+
+                                // Check if Google Translate is loaded
+                                if (typeof google !== 'undefined' && google.translate) {
+                                    var select = document.querySelector('.goog-te-combo');
+                                    if (select) {
+                                        select.value = lang;
+                                        // Create a proper change event
+                                        var event = new Event('change', { bubbles: true });
+                                        select.dispatchEvent(event);
+                                        console.log('Language changed via Google Translate');
+
+                                        // Hide UI again after language change
+                                        setTimeout(hideGoogleTranslateUI, 500);
+                                    } else {
+                                        console.log('Google Translate select element not found, retrying...');
+                                        // If Google Translate select element isn't available yet, try again
+                                        setTimeout(() => changeLanguage(lang), 500);
+                                    }
+                                } else {
+                                    console.log('Google Translate not loaded, retrying...');
+                                    // If Google Translate isn't loaded, try again after a short delay
+                                    setTimeout(() => changeLanguage(lang), 500);
+                                }
+                            }
+
+                            // Handle language selection
+                            if (languageOptions.length > 0) {
+                                languageOptions.forEach(option => {
+                                    option.addEventListener('click', function (e) {
+                                        e.preventDefault();
+                                        const lang = this.getAttribute('data-lang');
+                                        console.log('Language option clicked:', lang);
+
+                                        languageOptions.forEach(opt => opt.classList.remove('active'));
+                                        this.classList.add('active');
+
+                                        if (currentLanguage) {
+                                            currentLanguage.textContent = lang === 'en' ? 'English' : 'नेपाली';
+                                        }
+
+                                        if (languageToggle) {
+                                            languageToggle.classList.add('language-changing');
+                                            setTimeout(() => {
+                                                languageToggle.classList.remove('language-changing');
+                                            }, 400);
+                                        }
+
+                                        if (languageDropdown) {
+                                            languageDropdown.classList.remove('active');
+                                        }
+
+                                        changeLanguage(lang);
+                                    });
+                                });
+                            }
+
+                            // Set up a mutation observer to watch for Google Translate elements
+                            const observer = new MutationObserver(function (mutations) {
+                                mutations.forEach(function (mutation) {
+                                    if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                                        // Check if any added nodes are Google Translate elements
+                                        let hasGoogleElements = false;
+                                        mutation.addedNodes.forEach(node => {
+                                            if (node.nodeType === 1) { // Element node
+                                                if (node.classList &&
+                                                    (node.classList.contains('goog-te-banner-frame') ||
+                                                        node.classList.contains('goog-te-menu-frame') ||
+                                                        node.classList.contains('goog-te-gadget'))) {
+                                                    hasGoogleElements = true;
+                                                }
+                                            }
+                                        });
+
+                                        if (hasGoogleElements) {
+                                            setTimeout(hideGoogleTranslateUI, 100);
+                                        }
+                                    }
+                                });
+                            });
+
+                            // Start observing
+                            observer.observe(document.body, {
+                                childList: true,
+                                subtree: true
+                            });
+
+                            // Initial call to hide UI after a short delay to allow Google Translate to initialize
+                            setTimeout(hideGoogleTranslateUI, 2000);
                         }
                     });
-                    
-                    if (hasGoogleElements) {
-                        setTimeout(hideGoogleTranslateUI, 100);
-                    }
-                }
-            });
-        });
-
-        // Start observing
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-        
-        // Initial call to hide UI after a short delay to allow Google Translate to initialize
-        setTimeout(hideGoogleTranslateUI, 2000);
-    });
     </script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        console.log('DOM fully loaded');
-        
-        // Notice rotation functionality
-        const noticeContainer = document.querySelector('.notice-container');
-        const noticeItems = document.querySelectorAll('.notice-item');
-        let currentIndex = 0;
-        let rotationTimer = null;
-        const rotationInterval = 3000; // 3 seconds
+                    document.addEventListener('DOMContentLoaded', function () {
+                        console.log('DOM fully loaded');
 
-        // Show first notice
-        if (noticeItems.length > 0) {
-            noticeItems[0].classList.add('active');
-        }
+                        // Notice rotation functionality
+                        const noticeContainer = document.querySelector('.notice-container');
+                        const noticeItems = document.querySelectorAll('.notice-item');
+                        let currentIndex = 0;
+                        let rotationTimer = null;
+                        const rotationInterval = 3000; // 3 seconds
 
-        function showNextNotice() {
-            if (noticeItems.length <= 1) return;
+                        // Show first notice
+                        if (noticeItems.length > 0) {
+                            noticeItems[0].classList.add('active');
+                        }
 
-            const currentNotice = noticeItems[currentIndex];
-            currentNotice.classList.remove('active');
-            currentNotice.style.transform = 'translateX(-100%)';
-            currentNotice.style.opacity = '0';
+                        function showNextNotice() {
+                            if (noticeItems.length <= 1) return;
 
-            // Move to next notice
-            currentIndex = (currentIndex + 1) % noticeItems.length;
-            const nextNotice = noticeItems[currentIndex];
+                            const currentNotice = noticeItems[currentIndex];
+                            currentNotice.classList.remove('active');
+                            currentNotice.style.transform = 'translateX(-100%)';
+                            currentNotice.style.opacity = '0';
 
-            // Position next notice to the right before animating in
-            nextNotice.style.transform = 'translateX(100%)';
-            nextNotice.style.opacity = '0';
+                            // Move to next notice
+                            currentIndex = (currentIndex + 1) % noticeItems.length;
+                            const nextNotice = noticeItems[currentIndex];
 
-            // Trigger reflow
-            void nextNotice.offsetWidth;
+                            // Position next notice to the right before animating in
+                            nextNotice.style.transform = 'translateX(100%)';
+                            nextNotice.style.opacity = '0';
 
-            // Animate in the next notice
-            nextNotice.style.transform = 'translateX(0)';
-            nextNotice.style.opacity = '1';
-            nextNotice.classList.add('active');
-        }
+                            // Trigger reflow
+                            void nextNotice.offsetWidth;
 
-        // Start rotation
-        if (noticeItems.length > 1) {
-            rotationTimer = setInterval(showNextNotice, rotationInterval);
-        }
+                            // Animate in the next notice
+                            nextNotice.style.transform = 'translateX(0)';
+                            nextNotice.style.opacity = '1';
+                            nextNotice.classList.add('active');
+                        }
 
-        // Pause rotation on hover
-        if (noticeContainer) {
-            noticeContainer.addEventListener('mouseenter', () => {
-                if (rotationTimer) {
-                    clearInterval(rotationTimer);
-                    rotationTimer = null;
-                }
-            });
+                        // Start rotation
+                        if (noticeItems.length > 1) {
+                            rotationTimer = setInterval(showNextNotice, rotationInterval);
+                        }
 
-            // Resume rotation when mouse leaves
-            noticeContainer.addEventListener('mouseleave', () => {
-                if (!rotationTimer && noticeItems.length > 1) {
-                    rotationTimer = setInterval(showNextNotice, rotationInterval);
-                }
-            });
-        }
+                        // Pause rotation on hover
+                        if (noticeContainer) {
+                            noticeContainer.addEventListener('mouseenter', () => {
+                                if (rotationTimer) {
+                                    clearInterval(rotationTimer);
+                                    rotationTimer = null;
+                                }
+                            });
 
-        // Load notices (make sure this function exists)
-        loadNotices();
+                            // Resume rotation when mouse leaves
+                            noticeContainer.addEventListener('mouseleave', () => {
+                                if (!rotationTimer && noticeItems.length > 1) {
+                                    rotationTimer = setInterval(showNextNotice, rotationInterval);
+                                }
+                            });
+                        }
 
-        // Bootstrap toast functionality
-        const toasts = document.querySelectorAll('.toast');
-        toasts.forEach(toastEl => {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
-                new bootstrap.Toast(toastEl).show();
-            }
-        });
-    });
+                        // Load notices (make sure this function exists)
+                        loadNotices();
 
-    // You need to define this function somewhere
-    function loadNotices() {
-        // Your notice loading logic here
-        console.log('loadNotices function called');
-    }
+                        // Bootstrap toast functionality
+                        const toasts = document.querySelectorAll('.toast');
+                        toasts.forEach(toastEl => {
+                            if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+                                new bootstrap.Toast(toastEl).show();
+                            }
+                        });
+                    });
+
+                    // You need to define this function somewhere
+                    function loadNotices() {
+                        // Your notice loading logic here
+                        console.log('loadNotices function called');
+                    }
     </script>
 
-     <script>
-        function updateNepalTime() {
-            const now = new Date();
+    <script>
+                    function updateNepalTime() {
+                        const now = new Date();
 
-            // Nepal is UTC +5:45
-            const nepalOffsetMinutes = 5.75 * 60; // 5 hours 45 minutes in minutes
-            const localOffsetMinutes = now.getTimezoneOffset(); // current timezone offset from UTC
-            const totalOffset = (nepalOffsetMinutes + localOffsetMinutes) * 60000; // convert to milliseconds
+                        // Nepal is UTC +5:45
+                        const nepalOffsetMinutes = 5.75 * 60; // 5 hours 45 minutes in minutes
+                        const localOffsetMinutes = now.getTimezoneOffset(); // current timezone offset from UTC
+                        const totalOffset = (nepalOffsetMinutes + localOffsetMinutes) * 60000; // convert to milliseconds
 
-            const nepalTime = new Date(now.getTime() + totalOffset);
+                        const nepalTime = new Date(now.getTime() + totalOffset);
 
-            const hours = String(nepalTime.getHours()).padStart(2, '0');
-            const minutes = String(nepalTime.getMinutes()).padStart(2, '0');
-            const seconds = String(nepalTime.getSeconds()).padStart(2, '0');
+                        const hours = String(nepalTime.getHours()).padStart(2, '0');
+                        const minutes = String(nepalTime.getMinutes()).padStart(2, '0');
+                        const seconds = String(nepalTime.getSeconds()).padStart(2, '0');
 
-            document.getElementById('nepal-time').textContent = `${hours}:${minutes}:${seconds}`;
-        }
+                        document.getElementById('nepal-time').textContent = `${hours}:${minutes}:${seconds}`;
+                    }
 
-        setInterval(updateNepalTime, 1000);
-        updateNepalTime(); // Initial call
+                    setInterval(updateNepalTime, 1000);
+                    updateNepalTime(); // Initial call
     </script>
 </body>
+
 </html>
+

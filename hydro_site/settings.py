@@ -69,10 +69,16 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.request',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',  
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.organization_details',
+                'core.context_processors.notice_processor',
+                'django.template.context_processors.i18n',  
+            ],
+            'builtins': [
+                'django.templatetags.i18n',  
             ],
         },
     },
@@ -143,11 +149,26 @@ LANGUAGE_COOKIE_PATH = '/'
 LANGUAGE_COOKIE_SAMESITE = 'Lax'
 LANGUAGE_COOKIE_SECURE = False
 
-TIME_ZONE = 'UTC'
-
+# Use language prefix in URLs
 USE_I18N = True
+USE_L10N = True
 
+# Time zone settings
+TIME_ZONE = 'Asia/Kathmandu'
 USE_TZ = True
+
+# Add LocaleMiddleware to handle language selection
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'core.middleware.LanguageMiddleware',  # Our custom language middleware
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
 
 # Static files (CSS, JavaScript, Images)

@@ -1,0 +1,47 @@
+{% load i18n %}
+{% load language_switcher %}
+
+<div class="language-switcher">
+    <button class="language-button" id="languageToggle" aria-haspopup="true" aria-expanded="false" aria-label="{% trans 'Select language' %}">
+        <i class="bi bi-globe-americas" aria-hidden="true"></i>
+        <span class="current-language">
+            {% get_current_language as current_lang %}
+            {% for code, name in LANGUAGES %}
+                {% if code == current_lang %}{% get_language_info for code as lang %}{{ lang.name_local }}{% endif %}
+            {% endfor %}
+        </span>
+        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+    </button>
+    
+    <div class="language-dropdown" id="languageDropdown" role="menu" aria-label="{% trans 'Language options' %}">
+        {% get_available_languages as LANGUAGES %}
+        {% get_current_language as CURRENT_LANGUAGE %}
+        
+        {% for code, name in LANGUAGES %}
+            {% get_language_info for code as lang %}
+            {% if code == 'en' %}
+                <a href="/" 
+                   class="language-option {% if code == CURRENT_LANGUAGE %}active{% endif %}"
+                   data-lang="{{ code }}"
+                   role="menuitemradio"
+                   aria-checked="{% if code == CURRENT_LANGUAGE %}true{% else %}false{% endif %}"
+                   hreflang="{{ code }}"
+                   title="{% blocktranslate with language=name %}Switch to {{ language }}{% endblocktranslate %}">
+                    <span class="language-name">{{ lang.name_local }}</span>
+                    {% if code == CURRENT_LANGUAGE %}<span class="visually-hidden">{% trans '(current)' %}</span>{% endif %}
+                </a>
+            {% else %}
+                <a href="/{{ code }}/" 
+                   class="language-option {% if code == CURRENT_LANGUAGE %}active{% endif %}"
+                   data-lang="{{ code }}"
+                   role="menuitemradio"
+                   aria-checked="{% if code == CURRENT_LANGUAGE %}true{% else %}false{% endif %}"
+                   hreflang="{{ code }}"
+                   title="{% blocktranslate with language=name %}Switch to {{ language }}{% endblocktranslate %}">
+                    <span class="language-name">{{ lang.name_local }}</span>
+                    {% if code == CURRENT_LANGUAGE %}<span class="visually-hidden">{% trans '(current)' %}</span>{% endif %}
+                </a>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

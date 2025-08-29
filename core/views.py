@@ -20,7 +20,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.utils import timezone
-
+from django.utils.translation import gettext as _
 # Home Page View
 def home(request):
     context = {

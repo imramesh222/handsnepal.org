@@ -1,100 +1,153 @@
 document.addEventListener('DOMContentLoaded', function() {
     const languageToggle = document.getElementById('languageToggle');
     const languageDropdown = document.getElementById('languageDropdown');
-    const currentLanguage = document.querySelector('.current-language');
-    const languageOptions = document.querySelectorAll('.language-option');
-    const csrfToken = getCSRFToken();
-
+    
+    if (!languageToggle || !languageDropdown) return;
+    
+    const languageOptions = Array.from(document.querySelectorAll('.language-option'));
+    
+    // Initialize ARIA attributes
+    languageToggle.setAttribute('aria-haspopup', 'true');
+    languageToggle.setAttribute('aria-expanded', 'false');
+    
+    // Function to close dropdown
+    const closeDropdown = () => {
+        languageDropdown.classList.remove('show');
+        languageToggle.setAttribute('aria-expanded', 'false');
+    };
+    
     // Toggle dropdown
-    if (languageToggle) {
-        languageToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (languageDropdown) {
-                languageDropdown.classList.toggle('show');
-            }
-        });
-    }
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function() {
-        if (languageDropdown) {
-            languageDropdown.classList.remove('show');
-        }
-    });
-
-    // Handle language selection
-    languageOptions.forEach(option => {
-        option.addEventListener('click', function(e) {
-            e.preventDefault();
-            const lang = this.getAttribute('data-lang');
-            if (lang) {
-                setLanguage(lang);
-            }
-        });
-    });
-
-    // Set language function
-    function setLanguage(lang) {
-        if (!lang) return;
+    languageToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
         
-        // Create form data
-        const formData = new URLSearchParams();
-        formData.append('language', lang);
-        formData.append('next', window.location.pathname);
-        formData.append('csrfmiddlewaretoken', csrfToken);
-
-        // Send AJAX request to set language
-        fetch('/i18n/setlang/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': csrfToken
-            },
-            body: formData,
-            credentials: 'same-origin'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+        // Close all other open dropdowns first
+        document.querySelectorAll('.language-dropdown.show').forEach(dropdown => {
+            if (dropdown !== languageDropdown) {
+                dropdown.classList.remove('show');
+                const toggle = dropdown.previousElementSibling;
+                if (toggle && toggle.getAttribute('aria-expanded') === 'true') {
+                    toggle.setAttribute('aria-expanded', 'false');
+                }
             }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            } else {
-                console.error('Language switch failed:', data.message || 'Unknown error');
-                // Fallback to page reload with language parameter
-                window.location.href = `/${lang}${window.location.pathname}`;
-            }
-        })
-        .catch(error => {
-            console.error('Error switching language:', error);
-            // Fallback to page reload with language parameter
-            window.location.href = `/${lang}${window.location.pathname}`;
         });
-    }
-
-    // Helper function to get CSRF token
-    function getCSRFToken() {
-        // Try to get from meta tag
-        const metaTag = document.querySelector('meta[name="csrf-token"]');
-        if (metaTag) {
-            return metaTag.getAttribute('content');
-        }
-
-        // Fallback to cookie
-        const cookieValue = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('csrftoken='))
-            ?.split('=')[1];
+        
+        // Toggle current dropdown
+        if (isExpanded) {
+            closeDropdown();
+        } else {
+            // Position the dropdown before showing it
+            const toggleRect = this.getBoundingClientRect();
+            languageDropdown.style.top = `${toggleRect.bottom + window.scrollY}px`;
+            languageDropdown.style.right = `${window.innerWidth - toggleRect.right}px`;
             
-        if (cookieValue) {
-            return decodeURIComponent(cookieValue);
+            // Show the dropdown
+            languageDropdown.classList.add('show');
+            this.setAttribute('aria-expanded', 'true');
+            
+            // Focus first option when opening
+            const firstOption = languageDropdown.querySelector('.language-option');
+            if (firstOption) firstOption.focus();
         }
-
-        console.warn('CSRF token not found');
-        return '';
-    }
+    });
+    
+    // Handle window resize to reposition dropdown if open
+    window.addEventListener('resize', function() {
+        if (languageDropdown.classList.contains('show')) {
+            const toggleRect = languageToggle.getBoundingClientRect();
+            languageDropdown.style.top = `${toggleRect.bottom + window.scrollY}px`;
+            languageDropdown.style.right = `${window.innerWidth - toggleRect.right}px`;
+        }
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!languageToggle.contains(e.target) && !languageDropdown.contains(e.target)) {
+            closeDropdown();
+        }
+    });
+    
+    // Handle keyboard navigation for toggle button
+    languageToggle.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+            e.preventDefault();
+            this.click();
+        } else if (e.key === 'Escape') {
+            closeDropdown();
+            this.focus();
+        } else if (e.key === 'ArrowDown' && languageOptions.length > 0) {
+            e.preventDefault();
+            if (!languageDropdown.classList.contains('show')) {
+                languageDropdown.classList.add('show');
+                this.setAttribute('aria-expanded', 'true');
+            }
+            const firstOption = languageOptions[0];
+            if (firstOption) firstOption.focus();
+        } else if (e.key === 'ArrowUp' && languageOptions.length > 0) {
+            e.preventDefault();
+            if (!languageDropdown.classList.contains('show')) {
+                languageDropdown.classList.add('show');
+                this.setAttribute('aria-expanded', 'true');
+            }
+            languageOptions[languageOptions.length - 1].focus();
+        }
+    });
+    
+    // Handle keyboard navigation for dropdown options
+    languageOptions.forEach((option, index) => {
+        option.addEventListener('keydown', function(e) {
+            const isLastItem = index === languageOptions.length - 1;
+            const isFirstItem = index === 0;
+            
+            switch(e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    const nextItem = isLastItem ? languageOptions[0] : languageOptions[index + 1];
+                    if (nextItem) nextItem.focus();
+                    break;
+                    
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (isFirstItem) {
+                        languageToggle.focus();
+                    } else {
+                        languageOptions[index - 1].focus();
+                    }
+                    break;
+                    
+                case 'Escape':
+                    e.preventDefault();
+                    closeDropdown();
+                    languageToggle.focus();
+                    break;
+                    
+                case 'Home':
+                    e.preventDefault();
+                    languageOptions[0].focus();
+                    break;
+                    
+                case 'End':
+                    e.preventDefault();
+                    languageOptions[languageOptions.length - 1].focus();
+                    break;
+                    
+                case 'Tab':
+                    if (!e.shiftKey && isLastItem) {
+                        // If tabbing forward from last option, close dropdown
+                        closeDropdown();
+                    } else if (e.shiftKey && isFirstItem) {
+                        // If shift+tabbing from first option, focus the toggle
+                        e.preventDefault();
+                        languageToggle.focus();
+                    }
+                    break;
+                    
+                case ' ':
+                case 'Enter':
+                    e.preventDefault();
+                    this.click();
+                    break;
+            }
+        });
+    });
 });
