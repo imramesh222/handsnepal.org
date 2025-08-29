@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+{% load i18n %}
+<html lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% if org_details %}{{ org_details.site_title }}{% else %}HANDS Nepal{% endif %}{% endblock %}</title>
+    <link rel="icon" type="image/png" 
+          href="{{ org_details.logo.url }}">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Rubik:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icon Fonts -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries CSS -->
+    <link href="{% static 'lib/animate/animate.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    
+    <!-- Language Switcher CSS -->
+    <style>
+        .language-switcher {
+            position: relative;
+            display: inline-block;
+            margin-left: 15px;
+        }
+
+        .language-button {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 5px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .language-button:hover {
+            background: #e9ecef;
+            border-color: #ced4da;
+        }
+
+        .language-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-top: 5px;
+            min-width: 140px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .language-dropdown.show {
+            display: block;
+        }
+
+        .language-option {
+            padding: 8px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .language-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .language-option.active {
+            background-color: #f1f1f1;
+            font-weight: 500;
+        }
+
+        .language-flag {
+            width: 20px;
+            height: 15px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .language-switcher {
+                margin: 10px 0;
+                width: 100%;
+            }
+            
+            .language-button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .language-dropdown {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <style>
+        .whatsapp-float {
+            position: fixed;
+            bottom: 95px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .whatsapp-float:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .whatsapp-float i {
+            font-size: 1.5rem;
+        }
+
+        /* Notice Carousel */
+        .notice-container {
+            width: 100%;
+            height: 30px;
+            overflow: hidden;
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .notice-item {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease-in-out;
+            opacity: 0;
+            transform: translateY(-100%);
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 15px;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .notice-item a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            transition: all 0.2s ease;
+            pointer-events: auto;
+        }
+
+        .notice-item a:hover {
+            color: #ffc107;
+            text-decoration: none;
+        }
+
+        .notice-item i {
+            margin-right: 8px;
+        }
+
+        .notice-item.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateY(0); }
+            to { transform: translateY(-100%); }
+        }
+
+        @media (max-width: 991.98px) {
+            .notice-item {
+                font-size: 0.9rem;
+                white-space: normal;
+                text-align: center;
+            }
+
+            .bg-danger>div {
+                transform: none !important;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .bg-danger span,
+            .bg-danger i {
+                transform: none !important;
+                display: inline-block;
+            }
+        }
+
+        /* Mottos Styling */
+        .motto-item {
+            display: flex;
+            justify-content: center;
+            padding: 8px 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            line-height: 1.4;
+            flex: 1;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: none; 
+        }
+
+        .motto-english {
+            width: 30%;
+            background-color: #1947a0; 
+            color: #ffffff;
+        }
+
+        .motto-nepali {
+            background-color: #e41318; 
+            font-family: 'Preeti', sans-serif;
+            font-size: 1em;
+            letter-spacing: 1px;
+            color: #ffffff;
+            padding-right: 10px;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 991.98px) {
+            
+            .top-bar,
+            .topbar-right,
+            .motto-item {
+                display: none !important;
+            }
+            
+            .motto-item {
+                font-size: 0.9rem;
+                padding: 6px 10px;
+            }
+            
+            .motto-nepali {
+                font-size: 1em;
+            }
+        }
+
+        /* Modern Language Switcher Styles */
+        .language-switcher {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+
+        .language-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .language-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .language-button i {
+            font-size: 1.2rem;
+        }
+
+        .language-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            width: 180px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            padding: 8px 0;
+        }
+
+        .language-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .language-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #333;
+        }
+
+        .language-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .language-option.active {
+            background-color: #eef5ff;
+            color: #1947a0;
+            font-weight: 600;
+        }
+
+        .language-flag {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 12px;
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 991px) {
+            .language-switcher {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                margin-left: 0;
+                z-index: 1001;
+            }
+            
+            .language-button {
+                padding: 6px;
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            .language-button span {
+                display: none;
+            }
+            
+            .language-button i.bi-chevron-down {
+                display: none;
+            }
+            
+            .language-dropdown {
+                right: 0;
+                left: auto;
+                width: 160px;
+            }
+        }
+
+        /* Animation for language change */
+        @keyframes languageChange {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .language-changing {
+            animation: languageChange 0.4s ease;
+        }
+
+        /* RTL support */
+        [dir="rtl"] .language-flag {
+            margin-right: 0;
+            margin-left: 12px;
+        }
+
+         .goog-te-banner-frame {
+            display: none !important;
+        }
+        
+        .goog-te-gadget {
+            color: transparent !important;
+            font-size: 0 !important;
+        }
+        
+        .goog-te-gadget .goog-te-combo {
+            margin: 0;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            color: #000 !important;
+        }
+        
+        #google_translate_element {
+            display: inline-block;
+            position: relative;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            vertical-align: top;
+        }
+        
+        .goog-te-menu-frame {
+            z-index: 10000 !important; /* Ensure dropdown appears above other elements */
+        }
+                
+        body {
+            top: 0 !important;
+        }
+        
+        .skiptranslate iframe {
+            display: none !important;
+        }
+
+        /* Hide Google branding */
+        .goog-logo-link,
+        .goog-te-gadget span {
+            display: none !important;
+        }
+        
+        /* Fix for layout shifts caused by Google Translate */
+        .goog-tooltip {
+            display: none !important;
+        }
+        
+        .goog-tooltip:hover {
+            display: none !important;
+        }
+        
+        .goog-text-highlight {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border" role="status" style="width: 3rem; height: 3rem; color:#e41318 ;"></div>
+    </div>
+    <!-- Spinner End -->
+
+    <!-- Topbar Start -->
+    <div class="container-fluid px-0" style="background-color: #1947a0;">
+        <div class="row g-0 position-relative">
+            <!-- Follow Us - Hidden on mobile, shows on lg and up -->
+            <div class="col-12 col-lg-6 ps-3 ps-lg-5 text-start d-none d-lg-flex py-1" style="background-color: #1947a0;">
+                <div class="h-100 d-inline-flex align-items-center text-white">
+                    {% if org_details.facebook %}<a class="btn btn-link text-light"
+                        href="{{ org_details.facebook }}"><i class="fab fa-facebook-f"></i></a>{% endif %}
+                    {% if org_details.twitter %}<a class="btn btn-link text-light"
+                        href="{{ org_details.twitter }}"><i class="fab fa-twitter"></i></a>{% endif %}
+                    {% if org_details.linkedin %}<a class="btn btn-link text-light"
+                        href="{{ org_details.linkedin }}"><i class="fab fa-linkedin-in"></i></a>{% endif %}
+                    {% if org_details.instagram %}<a class="btn btn-link text-light"
+                        href="{{ org_details.instagram }}"><i class="fab fa-instagram"></i></a>{% endif %}
+                </div>
+                <div class="motto-item motto-english d-flex align-items-center justify-content-center">
+                    <div>"Empowering Community, Enriching Lives"</div>
+                </div>
+            </div>
+
+<!-- Phone Section - 3 columns on lg+ -->
+<div class="col-12 col-lg-6 text-center text-lg-end p-0 ms-auto" style="background-color: #e41318;">
+    <div class="h-100 topbar-right d-inline-flex align-items-center text-white py-2 pe-3">
+        <div class="motto-item motto-nepali d-flex align-items-center justify-content-center">
+            <div> "सम्मानित र समृद्ध जीवनका लागि सामुदायिक शसक्तिकरण" </div>
+        </div>
+        <!-- <span class="fs-5 fw-bold me-2"><i class="fa fa-phone-alt me-2"></i>Call Us:</span> -->
+        <span class="fs-5 fw-bold" style="margin-left: 50px;">{{ org_details.phone }}</span>
+    </div>
+    
+    <!-- Modern Language Switcher -->
+    <div class="language-switcher">
+        <!-- ADD ID HERE -->
+        <button class="language-button" id="languageToggle">
+            <i class="bi bi-globe-americas"></i>
+            <span class="current-language">English</span>
+            <i class="bi bi-chevron-down"></i>
+        </button>
+        
+        <!-- ADD ID HERE -->
+        <div class="language-dropdown" id="languageDropdown">
+            <div class="language-option active" data-lang="en">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIj48cGF0aCBmaWxsPSIjMDEyMTY1IiBkPSJNMCAwaDYwdjMwSDB6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGwzMCAxNUY2MCAzMEwzMCAxNUY2MCAwTDMwIDE1TDAgMHoiLz48cGF0aCBmaWxsPSIjYzYwMDIyIiBkPSJNMzAgMTVMNjAgMEw1MCAwTDMwIDlWMGwtMTAgMTVIMHY0aDEwbDEwIDE1djktMjB2OWwyMCAxMGg0MHYtNEwzMCAxNXoiLz48L3N2Zz4=" alt="English" class="language-flag">
+                English
+            </div>
+            <div class="language-option" data-lang="ne">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMCAwaDYwdjMwSDB6Ii8+PHBhdGggZmlsbD0iI2RjMDAwMCIgZD0iTTAgMGw2MCAzMFYwSDB6Ii8+PHBhdGggZmlsbD0iIzAwMDA4OCIgZD0iTTAgMGw2MCAzMEgweiIvPjxnIGZpbGw9IiMwMDAwODgiPjxjaXJjbGUgY3g9IjMwIiBjeT0iMTUiIHI9IjciLz48Y2lyY2xlIGN4PSIzMCIgY3k9IjE1IiByPSI0IiBmaWxsPSIjZmZmIi8+PGcgZmlsbD0iI2RjMDAwMCI+PHBhdGggZD0iTTMwIDRsMi45IDkuMUw0MiA5LjRsLTcuNCA1LjQgMi45IDkuMUwzMCAxOC44bC03LjQgNS40IDIuOS05LjFMMTggOS40bDkuMS0yLjl6Ii8+PC9nPjwvZz48L3N2Zz4=" alt="Nepali" class="language-flag">
+                नेपाली
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="google_translate_element" style="position:absolute; left:-9999px;"></div>
+        </div>
+    </div>
+    <!-- Topbar End -->
+
+    <!-- Desktop Header Start -->
+    <div class="container-fluid bg-white px-0 d-none d-lg-block">
+        <div class="container">
+            <div class="row py-2">
+                <div class="d-flex justify-content-between align-items-center w-100">
+
+                    <!-- Logo Section - Left Start -->
+                    <div class="d-flex align-items-centre">
+                        {% if org_details.logo %}
+                        <img src="{{ org_details.logo.url }}" alt="Logo" class="img-fluid logo-img"
+                            style="max-height: 65px;">
+                        {% else %}
+                        <div class="logo-circle bg-danger d-inline-flex align-items-center justify-content-centre">
+                            <span class="text-white fw-bold fs-3">
+                                {% if org_details %}{{ org_details.site_title }}{% else %}HandsNepal{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Stock Price & Admin Section - Right End -->
+                    <div class="text-end">
+                        <div class="bg-light text-dark p-2 rounded mb-2 text-nowrap">
+                            <div class="fw-bold small">Kathmandu Local Time</div>
+                            <div id="nepal-time" class="fs-6" style="text-align: center;">--:--:--</div>
+                        </div>
+
+                        <div class="admin-links">
+                            <small class="text-muted">
+                                <a href="{% url 'dashboard_home' %}" class="text-decoration-none text-muted">Admin Login | Dashboard</a>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Desktop Header End -->
+
+    <!-- Desktop Navigation Start -->
+    <div class="container-fluid sticky-top px-0 d-none d-lg-block" style="background-color: #e41318;">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-dark px-0 py-0" style="background-color: #e41318;">
+                <div class="navbar-nav mx-auto">
+                    <a href="{% url 'home' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Home</a>
+                    <a href="{% url 'about' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">About Us</a>
+                    <a href="{% url 'key_info_view' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">What
+                        We Do</a>
+                    <a href="{% url 'projects' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Projects</a>
+                    <a href="{% url 'reports' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Reports</a>
+                    <a href="{% url 'video' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Video</a>
+                    <a href="{% url 'photo' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Photo</a>
+                    <a href="{% url 'notice_list' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">News & Notices</a>
+                    <a href="{% url 'career_list' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Careers</a>
+                    <a href="{% url 'contact' %}" class="nav-item nav-link px-2 py-3 text-white fw-bold">Contact</a>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Desktop Navigation End -->
+
+    <!-- Mobile Navbar Start -->
+    <div class="container-fluid bg-white sticky-top px-0 d-lg-none">
+        <div class="container px-0">
+            <!-- Mobile Layout (logo and toggle in same line) -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white px-0 py-3">
+                <!-- Logo -->
+                {% if org_details.logo %}
+                <img src="{{ org_details.logo.url }}" alt="Logo" class="img-fluid logo-img"
+                    style="max-height: 65px; max-width:260px;">
+
+                {% else %}
+                <div class="logo-circle d-inline-flex align-items-center justify-content-center"
+                    style="background-color: #e41318;">
+                    <span class="text-white fw-bold fs-3">{% if org_details %}{{ org_details.site_title }}{% else
+                        %}Hydropower{% endif %}</span>
+                </div>
+                {% endif %}
+                <!-- Toggle Button -->
+                <button class="navbar-toggler me-3" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </nav>
+
+            <!-- Mobile Collapsible Content -->
+            <div class="collapse navbar-collapse px-0" id="navbarCollapse">
+                <div class="navbar-nav bg-light">
+                    <a href="{% url 'home' %}" class="nav-item nav-link px-2 py-3">Home</a>
+                    <a href="{% url 'about' %}" class="nav-item nav-link px-2 py-3">About</a>
+                    <a href="{% url 'services' %}" class="nav-item nav-link px-2 py-3">Services</a>
+                    <a href="{% url 'projects' %}" class="nav-item nav-link px-2 py-3">Projects</a>
+                    <a href="{% url 'reports' %}" class="nav-item nav-link px-2 py-3">Reports</a>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle px-2 py-3" data-bs-toggle="dropdown">Resources</a>
+                        <div class="dropdown-menu bg-light m-0">
+                            <a href="{% url 'downloads' %}" class="dropdown-item px-2 py-3">Downloads</a>
+                            <a href="{% url 'notice_list' %}" class="dropdown-item px-2 py-3">News & Notices</a>
+                            <a href="{% url 'career_list' %}" class="dropdown-item px-2 py-3">Careers</a>
+                        </div>
+                    </div>
+                    <a href="{% url 'contact' %}" class="nav-item nav-link ps-3">Contact</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Mobile Navbar End -->
+
+    <!-- Main Content -->
+    {% block content %}
+    {% endblock %}
+    <!-- Main Content End -->
+
+    <!-- WhatsApp Button -->
+    <!--{% if org_details.whatsapp_number %}-->
+    <!--<a href="https://wa.me/{{ org_details.whatsapp_number|cut:" "|cut:"+"|cut:"-" }}" class="btn btn-lg btn-success btn-lg-square rounded-circle whatsapp-float" target="_blank" rel="noopener noreferrer">-->
+    <!--    <i class="fab fa-whatsapp"></i>-->
+    <!--</a>-->
+    <!--{% endif %}-->
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark footer mt-5 py-3 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6 ps-2 pe-2">
+                    <div class="d-flex align-items-center mb-4">
+                        {% if org_details.logo %}
+                        <img src="{{ org_details.logo.url }}" alt="Logo" class="img-fluid logo-img"
+                            style="max-height: 110px;">
+                        {% else %}
+                        <div class="logo-circle bg-danger d-inline-flex align-items-center justify-content-center rounded-circle"
+                            style="width: 80px; height: 80px;">
+                            <span class="text-white fw-bold fs-3 text-center w-100">
+                                {% if org_details %}{{ org_details.site_title|slice:":1" }}{% else %}H{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if org_details.address %}
+                    <div class=" mb-2"><i class="fa fa-map-marker-alt me-3"></i>{{ org_details.address }}</div>
+                    {% endif %}
+                    {% if org_details.phone %}
+                    <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>{{ org_details.phone }}</p>
+                    {% endif %}
+                    {% if org_details.email %}
+                    <p class="mb-2"><i class="fa fa-envelope me-3"></i>{{ org_details.email }}</p>
+                    {% endif %}             
+                </div>
+                <div class="col-lg-3 col-md-6 ps-2 pe-2">
+                    <h3 class="text-white mb-4">Quick Links</h3>
+                    <a class="btn btn-link" href="{% url 'about' %}">About Us</a>
+                    <a class="btn btn-link" href="{% url 'contact' %}">Contact Us</a>
+                    <a class="btn btn-link" href="{% url 'services' %}">Services</a>
+                    <a class="btn btn-link" href="{% url 'notice_list' %}">Notice</a>
+                    <a class="btn btn-link" href="{% url 'career_list' %}">Careers</a>
+                </div>
+                <div class="col-lg-3 col-md-6 ps-2 pe-2">
+                    <h3 class="text-white mb-4">Office Hours</h3>
+                    <!-- <p class="mb-1">Sunday - Friday</p> -->
+                    {% if org_details.weekday_hours %}
+                    <p class="mb-1">{{ org_details.weekday_hours }}</p>
+                    {% endif %}
+                    <!-- <p class="mb-1">Saturday</p> -->
+                    {% if org_details.saturday_hours %}
+                    <p class="mb-1">{{ org_details.saturday_hours }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-lg-3 col-md-6 ps-2 pe-2">
+                    <h3 class="text-white mb-4">Newsletter</h3>
+                    <p>Stay updated with the latest HandsNepal news and reports.</p>
+                    <form method="post" action="{% url 'subscribe_newsletter' %}">
+                        {% csrf_token %}
+                        <div class="position-relative w-100">
+                            <input class="form-control bg-transparent w-100 py-3 ps-4 pe-5" name="email"
+                                type="email" placeholder="Your email" required>
+                            <button type="submit" class="btn py-2 position-absolute top-0 end-0 mt-2 me-2"
+                                style="background-color: #e41318; color: white;">SignUp</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+    <!-- Copyright -->
+    <div class="container-fluid copyright bg-dark py-4">
+        <div class="container text-center">
+            <span class="mb-2">  <a class="fw-semi-bold" style="color:white" href="#">{% if org_details %}{{ org_details.site_title }}{% else %}HandsNepal{% endif %}</a>. All Rights Reserved.</span>
+            <span class="mb-0 ps-3">Design by <a class="fw-semi-bold" style="color:white" href="https://www.kitwosd.com/" target="_blank" rel="noopener noreferrer">Kitwosd IT Support Center</a></span>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="btn btn-lg btn-lg-square rounded-circle back-to-top"
+        style="background-color: #e41318; color: white;"><i class="bi bi-arrow-up"></i></a>
+
+    <!-- Toast Message Container -->
+    <div aria-live="polite" aria-atomic="true" class="position-relative" style="z-index: 9999;">
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="toast align-items-center text-white bg-{{ message.tags|default:'danger' }} border-0"
+                role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        {{ message }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+ <!-- JS Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/wow/wow.min.js' %}"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    
+    <!-- Language Switcher JS -->
+    <script src="{% static 'js/language-switcher.js' %}"></script>
+    <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
+
+    <!-- Custom JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- Google Translate Script - MOVED TO BOTTOM -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            console.log('Google Translate initializing...');
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,ne',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+            
+            // Hide Google branding after a short delay
+            setTimeout(hideGoogleTranslateUI, 1000);
+        }
+        
+        function hideGoogleTranslateUI() {
+            // Hide the Google Translate banner
+            const googleBanner = document.querySelector('.goog-te-banner-frame');
+            if (googleBanner) {
+                googleBanner.style.display = 'none';
+            }
+            
+            // Hide the "Translate by Google" text
+            const googleText = document.querySelector('.goog-te-gadget');
+            if (googleText) {
+                googleText.style.color = 'transparent';
+                googleText.style.fontSize = '0';
+            }
+            
+            // Hide the Google Translate attribution
+            const googleLinks = document.querySelectorAll('a.goog-logo-link');
+            googleLinks.forEach(link => {
+                link.style.display = 'none';
+            });
+            
+            const googleFooter = document.querySelector('.goog-te-footer');
+            if (googleFooter) {
+                googleFooter.style.display = 'none';
+            }
+        }
+    </script>
+
+    <!-- Load Google Translate AFTER the function is defined -->
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM fully loaded and parsed');
+        
+        // Add IDs to your HTML elements if they don't have them
+        const languageToggle = document.getElementById('languageToggle');
+        const languageDropdown = document.getElementById('languageDropdown');
+        const currentLanguage = document.querySelector('.current-language');
+        const languageOptions = document.querySelectorAll('.language-option');
+
+        // Toggle dropdown visibility
+        if (languageToggle && languageDropdown) {
+            languageToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                languageDropdown.classList.toggle('active');
+            });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (languageToggle && languageDropdown && 
+                !languageToggle.contains(e.target) && !languageDropdown.contains(e.target)) {
+                languageDropdown.classList.remove('active');
+            }
+        });
+
+        // Function to change language
+        function changeLanguage(lang) {
+            console.log('Changing language to:', lang);
+            
+            // Check if Google Translate is loaded
+            if (typeof google !== 'undefined' && google.translate) {
+                var select = document.querySelector('.goog-te-combo');
+                if (select) {
+                    select.value = lang;
+                    // Create a proper change event
+                    var event = new Event('change', { bubbles: true });
+                    select.dispatchEvent(event);
+                    console.log('Language changed via Google Translate');
+                    
+                    // Hide UI again after language change
+                    setTimeout(hideGoogleTranslateUI, 500);
+                } else {
+                    console.log('Google Translate select element not found, retrying...');
+                    // If Google Translate select element isn't available yet, try again
+                    setTimeout(() => changeLanguage(lang), 500);
+                }
+            } else {
+                console.log('Google Translate not loaded, retrying...');
+                // If Google Translate isn't loaded, try again after a short delay
+                setTimeout(() => changeLanguage(lang), 500);
+            }
+        }
+
+        // Handle language selection
+        if (languageOptions.length > 0) {
+            languageOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    console.log('Language option clicked:', lang);
+
+                    languageOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+
+                    if (currentLanguage) {
+                        currentLanguage.textContent = lang === 'en' ? 'English' : 'नेपाली';
+                    }
+
+                    if (languageToggle) {
+                        languageToggle.classList.add('language-changing');
+                        setTimeout(() => {
+                            languageToggle.classList.remove('language-changing');
+                        }, 400);
+                    }
+
+                    if (languageDropdown) {
+                        languageDropdown.classList.remove('active');
+                    }
+
+                    changeLanguage(lang);
+                });
+            });
+        }
+
+        // Set up a mutation observer to watch for Google Translate elements
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                    // Check if any added nodes are Google Translate elements
+                    let hasGoogleElements = false;
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === 1) { // Element node
+                            if (node.classList && 
+                                (node.classList.contains('goog-te-banner-frame') || 
+                                 node.classList.contains('goog-te-menu-frame') ||
+                                 node.classList.contains('goog-te-gadget'))) {
+                                hasGoogleElements = true;
+                            }
+                        }
+                    });
+                    
+                    if (hasGoogleElements) {
+                        setTimeout(hideGoogleTranslateUI, 100);
+                    }
+                }
+            });
+        });
+
+        // Start observing
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // Initial call to hide UI after a short delay to allow Google Translate to initialize
+        setTimeout(hideGoogleTranslateUI, 2000);
+    });
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOM fully loaded');
+        
+        // Notice rotation functionality
+        const noticeContainer = document.querySelector('.notice-container');
+        const noticeItems = document.querySelectorAll('.notice-item');
+        let currentIndex = 0;
+        let rotationTimer = null;
+        const rotationInterval = 3000; // 3 seconds
+
+        // Show first notice
+        if (noticeItems.length > 0) {
+            noticeItems[0].classList.add('active');
+        }
+
+        function showNextNotice() {
+            if (noticeItems.length <= 1) return;
+
+            const currentNotice = noticeItems[currentIndex];
+            currentNotice.classList.remove('active');
+            currentNotice.style.transform = 'translateX(-100%)';
+            currentNotice.style.opacity = '0';
+
+            // Move to next notice
+            currentIndex = (currentIndex + 1) % noticeItems.length;
+            const nextNotice = noticeItems[currentIndex];
+
+            // Position next notice to the right before animating in
+            nextNotice.style.transform = 'translateX(100%)';
+            nextNotice.style.opacity = '0';
+
+            // Trigger reflow
+            void nextNotice.offsetWidth;
+
+            // Animate in the next notice
+            nextNotice.style.transform = 'translateX(0)';
+            nextNotice.style.opacity = '1';
+            nextNotice.classList.add('active');
+        }
+
+        // Start rotation
+        if (noticeItems.length > 1) {
+            rotationTimer = setInterval(showNextNotice, rotationInterval);
+        }
+
+        // Pause rotation on hover
+        if (noticeContainer) {
+            noticeContainer.addEventListener('mouseenter', () => {
+                if (rotationTimer) {
+                    clearInterval(rotationTimer);
+                    rotationTimer = null;
+                }
+            });
+
+            // Resume rotation when mouse leaves
+            noticeContainer.addEventListener('mouseleave', () => {
+                if (!rotationTimer && noticeItems.length > 1) {
+                    rotationTimer = setInterval(showNextNotice, rotationInterval);
+                }
+            });
+        }
+
+        // Load notices (make sure this function exists)
+        loadNotices();
+
+        // Bootstrap toast functionality
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(toastEl => {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+                new bootstrap.Toast(toastEl).show();
+            }
+        });
+    });
+
+    // You need to define this function somewhere
+    function loadNotices() {
+        // Your notice loading logic here
+        console.log('loadNotices function called');
+    }
+    </script>
+
+     <script>
+        function updateNepalTime() {
+            const now = new Date();
+
+            // Nepal is UTC +5:45
+            const nepalOffsetMinutes = 5.75 * 60; // 5 hours 45 minutes in minutes
+            const localOffsetMinutes = now.getTimezoneOffset(); // current timezone offset from UTC
+            const totalOffset = (nepalOffsetMinutes + localOffsetMinutes) * 60000; // convert to milliseconds
+
+            const nepalTime = new Date(now.getTime() + totalOffset);
+
+            const hours = String(nepalTime.getHours()).padStart(2, '0');
+            const minutes = String(nepalTime.getMinutes()).padStart(2, '0');
+            const seconds = String(nepalTime.getSeconds()).padStart(2, '0');
+
+            document.getElementById('nepal-time').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        setInterval(updateNepalTime, 1000);
+        updateNepalTime(); // Initial call
+    </script>
+</body>
+</html>

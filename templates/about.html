@@ -1,0 +1,1107 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+
+{% block content %}
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+  <div class="container py-5">
+    <h1 class="display-3 text-white animated slideInRight">About Us</h1>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb animated slideInRight mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="#">Pages</a></li>
+        <li class="breadcrumb-item active" aria-current="page">About Us</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+<!-- Page Header End -->
+
+<!-- About Section -->
+{% include "partials/about_section.html" %}
+
+<!-- Organizational Content Section Start -->
+<div class="container-xxl py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">
+      <h2 class="section-title" style="color: darkblue;">Our Organization</h2>
+      <p class="text-muted">Learn more about our mission, vision, and values that drive our work</p>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="row g-4">
+
+      <!-- First Row: Mission, Vision, Goals (shorter content) -->
+      <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+        <div class="org-item compact">
+          <div class="org-header">
+            <div class="org-icon mission">
+              <i class="fas fa-bullseye"></i>
+            </div>
+            <h4>Mission</h4>
+          </div>
+          <div class="org-content">
+            {{ organization_content.mission|safe }}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.2s">
+        <div class="org-item compact">
+          <div class="org-header">
+            <div class="org-icon vision">
+              <i class="fas fa-eye"></i>
+            </div>
+            <h4>Vision</h4>
+          </div>
+          <div class="org-content">
+            {{ organization_content.vision|safe }}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+        <div class="org-item compact">
+          <div class="org-header">
+            <div class="org-icon goals">
+              <i class="fas fa-flag-checkered"></i>
+            </div>
+            <h4>Goals</h4>
+          </div>
+          <div class="org-content">
+            {{ organization_content.goal|safe }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Second Row: Objectives (longer content - half width) -->
+      <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.4s">
+        <div class="org-item expanded">
+          <div class="org-header">
+            <div class="org-icon objectives">
+              <i class="fas fa-tasks"></i>
+            </div>
+            <h4>Objectives</h4>
+          </div>
+          <div class="org-content detailed">
+            {{ organization_content.objective|safe }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Values (longer content - half width) -->
+      <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.5s">
+        <div class="org-item expanded">
+          <div class="org-header">
+            <div class="org-icon values">
+              <i class="fas fa-heart"></i>
+            </div>
+            <h4>Values</h4>
+          </div>
+          <div class="org-content detailed">
+            {{ organization_content.value|safe }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Team List Section -->
+      <div class="col-12 wow fadeInUp" data-wow-delay="0.6s">
+        <div class="org-item">
+          <div class="org-header">
+            <div class="org-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <h4>Professional Team</h4>
+          </div>
+          <div class="org-content">
+            <div class="row g-4">
+              {% for member in teams %}
+              <div class="col-lg-4 col-md-6 mb-4">
+                <div class="team-card h-100 d-flex flex-column">
+                  <div class="team-img-container text-center p-3">
+                    <img class="img-fluid rounded-circle mb-3" 
+                         src="{{ member.photo.url }}" 
+                         alt="{{ member.name }}" 
+                         style="width: 180px; height: 180px; object-fit: cover; border: 5px solid #f8f9fa; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);">
+                  </div>
+                  <div class="team-info p-3 text-center flex-grow-1 d-flex flex-column">
+                    <div>
+                      <h5 class="mb-1 fw-bold">{{ member.name }}</h5>
+                      <p class="text-primary mb-3 fw-semibold">{{ member.position }}</p>
+                      {% if member.description %}
+                      <div class="team-description mb-3">
+                        <p class="mb-0 text-start">{{ member.description|truncatewords:30 }}</p>
+                      </div>
+                      {% endif %}
+                    </div>
+                    <div class="mt-auto pt-3">
+                      <div class="social-links d-flex justify-content-center gap-2">
+                        {% if member.facebook %}
+                        <a href="{{ member.facebook }}" class="btn btn-sm btn-outline-primary rounded-circle" target="_blank" title="Facebook">
+                          <i class="fab fa-facebook-f"></i>
+                        </a>
+                        {% endif %}
+                        {% if member.twitter %}
+                        <a href="{{ member.twitter }}" class="btn btn-sm btn-outline-info rounded-circle" target="_blank" title="Twitter">
+                          <i class="fab fa-twitter"></i>
+                        </a>
+                        {% endif %}
+                        {% if member.instagram %}
+                        <a href="{{ member.instagram }}" class="btn btn-sm btn-outline-danger rounded-circle" target="_blank" title="Instagram">
+                          <i class="fab fa-instagram"></i>
+                        </a>
+                        {% endif %}
+                        {% if member.email %}
+                        <a href="mailto:{{ member.email }}" class="btn btn-sm btn-outline-secondary rounded-circle" title="Email">
+                          <i class="fas fa-envelope"></i>
+                        </a>
+                        {% endif %}
+                        {% if member.phone %}
+                        <a href="tel:{{ member.phone }}" class="btn btn-sm btn-outline-success rounded-circle" title="Phone">
+                          <i class="fas fa-phone"></i>
+                        </a>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% empty %}
+              <div class="col-12 text-center py-5">
+                <div class="alert alert-info">
+                  <i class="fas fa-info-circle me-2"></i> Our team information is coming soon!
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+      <!-- Interactive Nepal Map - FIXED CONTAINER -->
+      <div class="col-12 wow fadeInUp" data-wow-delay="0.7s" style="margin-bottom: 1.5rem;" >
+        <div class="org-item featured map-container">
+          <div class="org-header">
+            <div class="org-icon geographic">
+              <i class="fas fa-map-marked-alt"></i>
+            </div>
+            <h4>Our Coverage Areas in Nepal</h4>
+          </div>
+          <div class="org-content detailed ">
+            <div id="nepal-map" style="width: 100%; height: 500px; ">
+              <!-- Here map is rendered -->
+            </div>
+          </div>
+          <div class="coverage-info mt-3">
+            <h6>Districts We Cover:</h6>
+            <div id="district-list" class="mt-2">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<!-- Why HANDS Nepal Section -->
+<div class="col-12 wow fadeInUp" data-wow-delay="0.9s">
+  <div class="org-item featured simple">
+    <div class="org-header">
+      <div class="org-icon why-hands">
+        <i class="fas fa-hand-holding-heart"></i>
+      </div>
+      <h4>Why HANDS Nepal</h4>
+    </div>
+    <div class="org-content why-content">
+      {{ organization_content.why_hands_nepal|safe }}
+    </div>
+  </div>
+</div>
+<br>
+
+    <!-- Updated JavaScript with proper height handling -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('nepal-map');
+        const districtListContainer = document.getElementById('district-list');
+        const width = container.offsetWidth;
+        const height = '100%'; // Increased height for better visibility
+
+        // Add loading indicator
+        container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Loading map...</p></div>';
+
+        // Define the districts where we have coverage
+        const coveredDistricts = [
+          'sindhuli', 'sindhupalchok', 'dolakha', 'udayapur', 'makwanpur',
+          'lalitpur', 'chitwan', 'mahottari', 'sarlahi', 'dhanusa',
+          'siraha', 'rasuwa', 'morang'
+        ];
+
+        // Display the list of covered districts
+        updateDistrictList(coveredDistricts);
+
+        // Standardized district mapping with common variations
+        const districtMappings = {
+          // Common misspellings
+          'lalitapur': 'lalitpur',
+          'makawanpur': 'makwanpur',
+          'chitawan': 'chitwan',
+          'sindhupalchowk': 'sindhupalchok',
+
+          // Covered districts
+          'sindhuli': 'sindhuli',
+          'sindhupalchok': 'sindhupalchok',
+          'dolakha': 'dolakha',
+          'udayapur': 'udayapur',
+          'makwanpur': 'makwanpur',
+          'lalitpur': 'lalitpur',
+          'chitwan': 'chitwan',
+          'mahottari': 'mahottari',
+          'sarlahi': 'sarlahi',
+          'dhanusa': 'dhanusa',
+          'siraha': 'siraha',
+          'rasuwa': 'rasuwa',
+          'morang': 'morang'
+        };
+
+        // Function to check if a district is in our coverage
+        function isDistrictCovered(districtName) {
+          if (!districtName) return false;
+
+          // Normalize the district name
+          const normalized = districtName.toLowerCase().trim();
+          const mappedName = districtMappings[normalized] || normalized;
+
+          return coveredDistricts.includes(mappedName);
+        }
+
+        function updateDistrictList(districts) {
+          if (districts.length > 0) {
+            const districtTags = districts.map(district =>
+              `<span class="badge bg-primary me-1 mb-1">${district.charAt(0).toUpperCase() + district.slice(1)}</span>`
+            ).join('');
+            districtListContainer.innerHTML = districtTags;
+          } else {
+            districtListContainer.innerHTML = '<span class="text-muted">No districts identified</span>';
+          }
+        }
+
+        // Load Nepal map data
+        d3.json('https://raw.githubusercontent.com/mesaugat/geoJSON-Nepal/master/nepal-districts.geojson')
+          .then(function (geojson) {
+            container.innerHTML = '';
+
+            // Create SVG container with responsive dimensions
+            const svg = d3.select('#nepal-map')
+              .append('svg')
+              .attr('width', '100%')
+              .attr('height', height)
+              .attr('viewBox', '0 0 1200 700') // Increased viewBox for better proportions
+            // .attr('preserveAspectRatio', 'xMidYMid meet');
+
+            // Create projection with better sizing
+            const projection = d3.geoMercator()
+              .fitSize([1200, 700], geojson);
+
+            const path = d3.geoPath().projection(projection);
+
+            function getDistrictName(districtProperties) {
+              if (!districtProperties) return '';
+
+              const possibleNames = ['DIST_EN', 'DISTRICT', 'NAME', 'name', 'District', 'DIST_NAME'];
+
+              for (const propName of possibleNames) {
+                if (districtProperties[propName]) {
+                  return districtProperties[propName].toString().trim();
+                }
+              }
+              return '';
+            }
+
+            // Create tooltip div
+            const tooltip = d3.select('body').append('div')
+              .attr('class', 'map-tooltip')
+              .style('opacity', 0)
+              .style('position', 'absolute')
+              .style('background', 'rgba(0, 0, 0, 0.8)')
+              .style('color', 'white')
+              .style('padding', '8px 0px 12px')
+              .style('border-radius', '4px')
+              .style('font-size', '14px')
+              .style('pointer-events', 'none')
+              .style('z-index', '1000')
+              .style('transition', 'opacity 0.2s');
+
+            // Draw districts
+            svg.selectAll('path')
+              .data(geojson.features)
+              .enter()
+              .append('path')
+              .attr('d', path)
+              .attr('fill', function (d) {
+                const districtName = getDistrictName(d.properties);
+                return isDistrictCovered(districtName) ? '#e74c3c' : '#e0e0e0';
+              })
+              .attr('stroke', '#fff')
+              .attr('stroke-width', 1.5)
+              .style('cursor', 'pointer')
+              .on('mouseover', function (event, d) {
+                const districtName = getDistrictName(d.properties);
+                const isCovered = isDistrictCovered(districtName);
+                const tooltipText = `${districtName}${isCovered ? ' (Coverage Area)' : ''}`;
+                
+                // Update tooltip content and position
+                tooltip
+                  .html(tooltipText)
+                  .style('left', (event.pageX + 10) + 'px')
+                  .style('top', (event.pageY - 30) + 'px')
+                  .transition()
+                  .duration(200)
+                  .style('opacity', 1);
+                
+                // Highlight district
+                d3.select(this)
+                  .transition()
+                  .duration(200)
+                  .attr('fill', '#3498db')
+                  .attr('stroke-width', 2.5);
+              })
+              .on('mousemove', function(event) {
+                // Update tooltip position while moving mouse
+                tooltip
+                  .style('left', (event.pageX + 10) + 'px')
+                  .style('top', (event.pageY - 30) + 'px');
+              })
+              .on('mouseout', function (event, d) {
+                const districtName = getDistrictName(d.properties);
+                
+                // Hide tooltip
+                tooltip.transition()
+                  .duration(200)
+                  .style('opacity', 0);
+                
+                // Reset district appearance
+                d3.select(this)
+                  .transition()
+                  .duration(200)
+                  .attr('fill', isDistrictCovered(districtName) ? '#e74c3c' : '#e0e0e0')
+                  .attr('stroke-width', 1.5);
+              });
+
+            // Add zoom functionality
+            const zoom = d3.zoom()
+              .scaleExtent([0.7, 6])
+              .on('zoom', function (event) {
+                svg.selectAll('path')
+                  .attr('transform', event.transform);
+              });
+
+            svg.call(zoom);
+
+            // Add controls container
+            const controlsContainer = d3.select('#nepal-map')
+              .append('div')
+              .style('position', 'absolute')
+              .style('top', '15px')
+              .style('right', '15px')
+              .style('display', 'flex')
+              .style('gap', '15px')
+              .style('z-index', '1000');
+
+            // Container for zoom controls
+            const zoomContainer = controlsContainer.append('div')
+              .style('display', 'flex')
+              .style('flex-direction', 'column')
+              .style('background', 'white')
+              .style('border-radius', '4px')
+              .style('box-shadow', '0 1px 5px rgba(0,0,0,0.2)');
+
+            // Add zoom controls
+            const zoomControls = zoomContainer.append('div')
+              .style('display', 'flex')
+              .style('flex-direction', 'column');
+
+            // Add zoom in button
+            zoomControls.append('button')
+              .html('+')
+              .style('width', '30px')
+              .style('height', '30px')
+              .style('background', 'white')
+              .style('border', '1px solid #ddd')
+              .style('border-radius', '4px 4px 0 0')
+              .style('cursor', 'pointer')
+              .style('font-size', '16px')
+              .style('color', '#555')
+              .on('mouseover', function () { d3.select(this).style('background', '#f5f5f5'); })
+              .on('mouseout', function () { d3.select(this).style('background', 'white'); })
+              .on('click', () => svg.transition().call(zoom.scaleBy, 1.5));
+
+            // Add zoom out button
+            zoomControls.append('button')
+              .html('−')
+              .style('width', '30px')
+              .style('height', '30px')
+              .style('background', 'white')
+              .style('border', '1px solid #ddd')
+              .style('border-top', 'none')
+              .style('border-radius', '0 0 4px 4px')
+              .style('cursor', 'pointer')
+              .style('font-size', '16px')
+              .style('color', '#555')
+              .on('mouseover', function () { d3.select(this).style('background', '#f5f5f5'); })
+              .on('mouseout', function () { d3.select(this).style('background', 'white'); })
+              .on('click', () => svg.transition().call(zoom.scaleBy, 0.75));
+
+            // Container for legend
+            const legendContainer = controlsContainer.append('div')
+              .style('background', 'white')
+              .style('border-radius', '4px')
+              .style('box-shadow', '0 1px 5px rgba(0,0,0,0.2)')
+              .style('padding', '5px 10px')
+              // .style('display', 'flex')
+              .style('align-items', 'center')
+              .style('gap', '10px');
+
+            // Add legend items
+            const legendItems = [
+              { color: '#e74c3c', label: 'Coverage Area' },
+              { color: '#e0e0e0', label: 'Other Area' }
+            ];
+
+            // Add legend items
+            legendContainer.selectAll('.legend-item')
+              .data(legendItems)
+              .enter()
+              .append('div')
+              .attr('class', 'legend-item')
+              .style('display', 'flex')
+              .style('align-items', 'center')
+              .style('gap', '5px')
+              .style('font-size', '12px')
+              .style('padding', '2px 5px')
+              .style('border-radius', '3px')
+              // .style('background', 'rgba(255, 255, 255, 0.7)')
+              .html(d => `
+                  <span style="display:inline-block; width:12px; height:12px; background:${d.color}; border:1px solid #ddd; border-radius:2px;"></span>
+                  <span>${d.label}</span>
+                `);
+
+
+          })
+          .catch(function (error) {
+            console.error('Error loading map data:', error);
+            container.innerHTML =
+              '<div class="alert alert-warning text-center">' +
+              '<i class="fas fa-exclamation-triangle mb-2"></i><br>' +
+              'Unable to load the map. Please check your internet connection and refresh the page.' +
+              '</div>';
+          });
+      });
+    </script>
+
+    <!-- Enhanced CSS for better map container sizing -->
+    <style>
+      /* Map Container Specific Styles */
+      .org-item.map-container {
+        min-height: 500px;
+        /* Increased minimum height for map container */
+        /* padding: 4rem; */
+        /* More padding for better spacing */
+      }
+
+      .org-item.map-container .org-content.detailed {
+        max-height: none;
+        /* Remove height restriction for map container */
+        overflow: visible;
+        /* Allow full visibility */
+      }
+
+      #nepal-map {
+        border-radius: 12px;
+        overflow: hidden;
+        /* box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); */
+        /* background: linear-gradient(0deg, #30664b 0%); */
+        /* margin: 25px 0; */
+        position: relative;
+        min-height: 300px;
+        padding: 50px 50px 50px 50px;
+
+      }
+
+      #nepal-map svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+      }
+
+      #nepal-map path {
+        transition: all 0.3s ease;
+      }
+
+      #nepal-map path:hover {
+        filter: drop-shadow(0 0 8px rgba(52, 152, 219, 0.8));
+      }
+
+      .map-legend {
+        margin: 20px 0;
+        padding: 5px;
+        /* background: rgba(255, 255, 255, 0.9); */
+        /* border-radius: 8px;
+          border: 1px solid rgba(0, 0, 0, 0.05); */
+      }
+
+      .coverage-info {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .coverage-info h6 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 12px;
+        font-size: 1.1rem;
+      }
+
+      /* Responsive adjustments for map */
+      @media (max-width: 1200px) {
+        .org-item.map-container {
+          min-height: 550px;
+          padding: 2rem;
+        }
+
+        #nepal-map {
+          min-height: 650px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .org-item.map-container {
+          min-height: 600px;
+          padding: 1.5rem;
+        }
+
+        #nepal-map {
+          height: 500px !important;
+          min-height: 500px;
+          margin: 15px 0;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .org-item.map-container {
+          min-height: 550px;
+          padding: 1rem;
+        }
+
+        #nepal-map {
+          height: 450px !important;
+          min-height: 450px;
+        }
+
+        .coverage-info {
+          padding: 15px;
+        }
+      }
+    </style>
+    <!-- Thematic Areas (simple list - full width) -->
+    <div class="col-12 wow fadeInUp" data-wow-delay="0.8s">
+      <div class="col-12 wow fadeInUp" data-wow-delay="0.7s">
+        <div class="org-item featured simple">
+          <div class="org-header">
+            <div class="org-icon thematic">
+              <i class="fas fa-project-diagram"></i>
+            </div>
+            <h4>Thematic Areas</h4>
+          </div>
+          <div class="org-content theme-list">
+            {{ organization_content.theme_area|safe }}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- Organizational Content Section End -->
+
+<style>
+  /* Why HANDS Nepal specific styling */
+.org-item .org-icon.why-hands {
+  background: #f39c12; /* warm orange tone */
+  color: white;
+  padding: 12px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin-right: 12px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.why-content {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #2c3e50;
+  padding: 15px 5px;
+}
+
+.why-content p {
+  margin-bottom: 12px;
+}
+
+.why-content ul {
+  padding-left: 20px;
+  list-style: disc;
+  margin: 10px 0;
+}
+
+/* Responsive text adjustments */
+@media (max-width: 768px) {
+  .why-content {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 576px) {
+  .why-content {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+}
+
+  /* Section Title */
+  .section-title {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 2.2rem;
+    position: relative;
+    display: inline-block;
+  }
+
+  .section-title::after {
+    content: '';         
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(45deg, #007bff, #28a745);
+    border-radius: 2px;
+  }
+
+  /* Organization Items - Different sizes for different content lengths */
+  .org-item {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    height: 100%;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Compact items for shorter content */
+  .org-item.compact {
+    min-height: 200px;
+    max-height: 300px;
+  }
+
+  /* Expanded items for medium content */
+  .org-item.expanded {
+    min-height: 400px;
+  }
+
+  /* Featured items for longest content */
+  .org-item.featured {
+    background-color: #fff;
+    /* background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); */
+    border: 2px solid rgba(0, 123, 255, 0.08);
+    min-height: 300px;
+  }
+
+  /* Simple styling for thematic areas */
+  .org-item.simple {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    min-height: 200px;
+  }
+
+  .org-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--item-color);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .org-item:hover::before {
+    transform: scaleX(1);
+  }
+
+  .org-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .org-item.featured::before,
+  .org-item.expanded::before {
+    height: 4px;
+  }
+
+  /* Header Section */
+  .org-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .org-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.3rem;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .org-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
+
+  /* Icon Colors */
+  .org-icon.mission {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    --item-color: #007bff;
+  }
+
+  .org-icon.vision {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    --item-color: #28a745;
+  }
+
+  .org-icon.goals {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    --item-color: #ffc107;
+  }
+
+  .org-icon.objectives {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    --item-color: #dc3545;
+  }
+
+  .org-icon.values {
+    background: linear-gradient(135deg, #6f42c1, #5a32a3);
+    --item-color: #6f42c1;
+  }
+
+  .org-icon.geographic {
+    background: linear-gradient(135deg, #20c997, #1aa179);
+    --item-color: #20c997;
+  }
+
+  .org-icon.thematic {
+    background: linear-gradient(135deg, #fd7e14, #e8650e);
+    --item-color: #fd7e14;
+  }
+
+  .org-item:nth-child(1) {
+    --item-color: #007bff;
+  }
+
+  .org-item:nth-child(2) {
+    --item-color: #28a745;
+  }
+
+  .org-item:nth-child(3) {
+    --item-color: #ffc107;
+  }
+
+  .org-item:nth-child(4) {
+    --item-color: #dc3545;
+  }
+
+  .org-item:nth-child(5) {
+    --item-color: #6f42c1;
+  }
+
+  .org-item:nth-child(6) {
+    --item-color: #20c997;
+  }
+
+  .org-item:nth-child(7) {
+    --item-color: #fd7e14;
+  }
+
+  /* Content Styling */
+  .org-content {
+    color: #5a6c7d;
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+
+  /* Detailed content for longer sections */
+  .org-content.detailed {
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+  }
+
+  .org-content.detailed::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .org-content.detailed::-webkit-scrollbar-track {
+    background: #f7fafc;
+    border-radius: 3px;
+  }
+
+  .org-content.detailed::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+  }
+
+  .org-content.detailed::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+  }
+
+  /* Theme list styling */
+  .org-content.theme-list {
+    column-count: 3;
+    column-gap: 2rem;
+    column-rule: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .org-content.theme-list ul {
+    margin: 0;
+    padding-left: 1rem;
+    break-inside: avoid;
+  }
+
+  .org-content.theme-list li {
+    margin-bottom: 0.5rem;
+    break-inside: avoid;
+    font-weight: 500;
+    color: #4a5568;
+  }
+
+  .org-content p {
+    margin-bottom: 0.8rem;
+  }
+
+  .org-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .org-content ul,
+  .org-content ol {
+    padding-left: 1.2rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .org-content li {
+    margin-bottom: 0.4rem;
+    line-height: 1.5;
+  }
+
+  /* Team Section Styles */
+  .team-card {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .team-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+  }
+
+  .team-img-container {
+    padding: 1.5rem 1.5rem 0;
+  }
+
+  .team-info {
+    padding: 1.5rem;
+  }
+
+  .team-description {
+    color: #6c757d;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .social-links .btn {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .social-links .btn:hover {
+    transform: translateY(-3px);
+  }
+
+  .social-links .btn i {
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 767.98px) {
+    .team-img-container {
+      padding: 1rem 1rem 0;
+    }
+    
+    .team-info {
+      padding: 1rem;
+    }
+    
+    .social-links .btn {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .org-content strong {
+    color: #2c3e50;
+    font-weight: 600;
+  }
+
+  .org-content a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .org-content a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+  }
+
+  /* List styling improvements */
+  .org-content ul li::marker {
+    color: #6c757d;
+  }
+
+  .org-content ol li::marker {
+    color: #6c757d;
+    font-weight: 600;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .org-item {
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      min-height: auto !important;
+      max-height: none !important;
+    }
+
+    .org-item.compact {
+      min-height: auto;
+    }
+
+    .org-item.expanded {
+      min-height: auto;
+    }
+
+    .org-content.detailed {
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .org-content.theme-list {
+      column-count: 2;
+      column-gap: 1.5rem;
+    }
+
+    .org-icon {
+      width: 45px;
+      height: 45px;
+      font-size: 1.1rem;
+    }
+
+    .org-header h4 {
+      font-size: 1.1rem;
+    }
+
+    .org-content {
+      font-size: 0.9rem;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .org-header {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .org-icon {
+      margin-right: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .org-content.theme-list {
+      column-count: 1;
+    }
+  }
+
+  /* Animation Enhancement */
+  .wow {
+    visibility: hidden;
+  }
+
+  .wow.fadeInUp {
+    animation-name: fadeInUp;
+    animation-duration: 0.8s;
+    animation-fill-mode: both;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+{% endblock %}

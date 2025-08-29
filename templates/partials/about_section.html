@@ -1,0 +1,46 @@
+
+{% load custom_filters %}
+
+<!-- About Start -->
+<div class="container-xxl py-5" id="about">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <!-- Image Column -->
+      <div class="col-lg-6 mx-auto">
+        <div class="overflow-hidden rounded shadow-sm">
+          <img
+            src="{{ about_images.0.image.url }}"
+            class="w-100 h-auto object-fit-cover"
+            alt="About Image"
+            style="max-height: 450px;"
+          >
+        </div>
+      </div>
+
+      <!-- Text Column -->
+      <div class="col-lg-6">
+        <p class="fw-medium text-uppercase text-danger mb-2">About Us</p>
+        <h1 class="display-5 mb-3">{{ about_info.heading }}</h1>
+        {% with about_info.description|split_at_word:120 as parts %}
+          <p class="mb-4" style="text-align: justify; text-align-last: justify; hyphens: auto; word-spacing: -0.05em;">
+            {{ parts.0|safe }}
+          </p>
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Extended Content (below image+text row) -->
+    <div class="row">
+      <div class="col-12">
+        {% with about_info.description|split_at_word:120 as parts %}
+          {% if parts.1 %}
+            <p class="mt-3" style="text-align: justify; text-align-last: justify; hyphens: auto; word-spacing: -0.05em;">
+              {{ parts.1|safe }}
+            </p>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+</div>
+<!-- About End -->

@@ -1,0 +1,48 @@
+{% extends "admin_base.html" %}
+{% block title %}Facts{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Facts</h2>
+    <a href="{% url 'add_fact' %}" class="btn btn-success">Add Fact</a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>Icon Class</th>
+            <th>Number</th>
+            <th>Label</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fact in facts %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ fact.icon_class }}</td>
+                <td>{{ fact.number }}</td>
+                <td>{{ fact.label }}</td>
+                <td>
+                    <a href="{% url 'edit_fact' fact.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_fact' fact.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No facts added yet.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

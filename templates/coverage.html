@@ -1,0 +1,468 @@
+<!-- Interactive Nepal Map - FIXED CONTAINER -->
+<div class="col-12 wow fadeInUp" data-wow-delay="0.7s" style="margin-bottom: 1.5rem;">
+    <div class="org-item featured map-container">
+        <div class="org-header">
+            <div class="org-icon geographic">
+                <i class="fas fa-map-marked-alt"></i>
+            </div>
+            <h4>Our Coverage Areas in Nepal</h4>
+        </div>
+        <div class="org-content detailed">
+            <div id="nepal-map" style="width: 100%; height: 500px;">
+                <!-- Here map is rendered -->
+            </div>
+        </div>
+        <div class="coverage-info mt-3">
+            <h6>Districts We Cover:</h6>
+            <div id="district-list" class="mt-2">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- D3.js Library -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<!-- Map JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('nepal-map');
+        const districtListContainer = document.getElementById('district-list');
+        const width = container.offsetWidth;
+        const height = '100%';
+
+        // Add loading indicator
+        container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Loading map...</p></div>';
+
+        // Define the districts where we have coverage
+        const coveredDistricts = [
+            'sindhuli', 'sindhupalchok', 'dolakha', 'udayapur', 'makwanpur',
+            'lalitpur', 'chitwan', 'mahottari', 'sarlahi', 'dhanusa',
+            'siraha', 'rasuwa', 'morang'
+        ];
+
+        // Display the list of covered districts
+        updateDistrictList(coveredDistricts);
+
+        // Standardized district mapping with common variations
+        const districtMappings = {
+            // Common misspellings
+            'lalitapur': 'lalitpur',
+            'makawanpur': 'makwanpur',
+            'chitawan': 'chitwan',
+            'sindhupalchowk': 'sindhupalchok',
+
+            // Covered districts
+            'sindhuli': 'sindhuli',
+            'sindhupalchok': 'sindhupalchok',
+            'dolakha': 'dolakha',
+            'udayapur': 'udayapur',
+            'makwanpur': 'makwanpur',
+            'lalitpur': 'lalitpur',
+            'chitwan': 'chitwan',
+            'mahottari': 'mahottari',
+            'sarlahi': 'sarlahi',
+            'dhanusa': 'dhanusa',
+            'siraha': 'siraha',
+            'rasuwa': 'rasuwa',
+            'morang': 'morang'
+        };
+
+        // Function to check if a district is in our coverage
+        function isDistrictCovered(districtName) {
+            if (!districtName) return false;
+
+            // Normalize the district name
+            const normalized = districtName.toLowerCase().trim();
+            const mappedName = districtMappings[normalized] || normalized;
+
+            return coveredDistricts.includes(mappedName);
+        }
+
+        function updateDistrictList(districts) {
+            if (districts.length > 0) {
+                const districtTags = districts.map(district =>
+                    `<span class="badge bg-primary me-1 mb-1">${district.charAt(0).toUpperCase() + district.slice(1)}</span>`
+                ).join('');
+                districtListContainer.innerHTML = districtTags;
+            } else {
+                districtListContainer.innerHTML = '<span class="text-muted">No districts identified</span>';
+            }
+        }
+
+        // Load Nepal map data
+        d3.json('https://raw.githubusercontent.com/mesaugat/geoJSON-Nepal/master/nepal-districts.geojson')
+            .then(function (geojson) {
+                container.innerHTML = '';
+
+                // Create SVG container with responsive dimensions
+                const svg = d3.select('#nepal-map')
+                    .append('svg')
+                    .attr('width', '100%')
+                    .attr('height', height)
+                    .attr('viewBox', '0 0 1200 700');
+
+                // Create projection with better sizing
+                const projection = d3.geoMercator()
+                    .fitSize([1200, 700], geojson);
+
+                const path = d3.geoPath().projection(projection);
+
+                function getDistrictName(districtProperties) {
+                    if (!districtProperties) return '';
+
+                    const possibleNames = ['DIST_EN', 'DISTRICT', 'NAME', 'name', 'District', 'DIST_NAME'];
+
+                    for (const propName of possibleNames) {
+                        if (districtProperties[propName]) {
+                            return districtProperties[propName].toString().trim();
+                        }
+                    }
+                    return '';
+                }
+
+                // Create tooltip div
+                const tooltip = d3.select('body').append('div')
+                    .attr('class', 'map-tooltip')
+                    .style('opacity', 0)
+                    .style('position', 'absolute')
+                    .style('background', 'rgba(0, 0, 0, 0.8)')
+                    .style('color', 'white')
+                    .style('padding', '0px 8px 0px 8px')
+                    .style('border-radius', '4px')
+                    .style('font-size', '14px')
+                    .style('pointer-events', 'none')
+                    .style('z-index', '1000')
+                    .style('transition', 'opacity 0.2s');
+
+                // Draw districts
+                svg.selectAll('path')
+                    .data(geojson.features)
+                    .enter()
+                    .append('path')
+                    .attr('d', path)
+                    .attr('fill', function (d) {
+                        const districtName = getDistrictName(d.properties);
+                        return isDistrictCovered(districtName) ? '#e74c3c' : '#e0e0e0';
+                    })
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 1.5)
+                    .style('cursor', 'pointer')
+                    .on('mouseover', function (event, d) {
+                        const districtName = getDistrictName(d.properties);
+                        const isCovered = isDistrictCovered(districtName);
+                        const tooltipText = `${districtName}${isCovered ? ' (Coverage Area)' : ''}`;
+
+                        // Update tooltip content and position
+                        tooltip
+                            .html(tooltipText)
+                            .style('left', (event.pageX + 10) + 'px')
+                            .style('top', (event.pageY - 30) + 'px')
+                            .transition()
+                            .duration(200)
+                            .style('opacity', 1);
+
+                        // Highlight district
+                        d3.select(this)
+                            .transition()
+                            .duration(200)
+                            .attr('fill', '#3498db')
+                            .attr('stroke-width', 2.5);
+                    })
+                    .on('mousemove', function (event) {
+                        // Update tooltip position while moving mouse
+                        tooltip
+                            .style('left', (event.pageX + 10) + 'px')
+                            .style('top', (event.pageY - 30) + 'px');
+                    })
+                    .on('mouseout', function (event, d) {
+                        const districtName = getDistrictName(d.properties);
+
+                        // Hide tooltip
+                        tooltip.transition()
+                            .duration(200)
+                            .style('opacity', 0);
+
+                        // Reset district appearance
+                        d3.select(this)
+                            .transition()
+                            .duration(200)
+                            .attr('fill', isDistrictCovered(districtName) ? '#e74c3c' : '#e0e0e0')
+                            .attr('stroke-width', 1.5);
+                    });
+
+                // Add zoom functionality
+                const zoom = d3.zoom()
+                    .scaleExtent([0.7, 6])
+                    .on('zoom', function (event) {
+                        svg.selectAll('path')
+                            .attr('transform', event.transform);
+                    });
+
+                svg.call(zoom);
+
+                // Add controls container
+                const controlsContainer = d3.select('#nepal-map')
+                    .append('div')
+                    .style('position', 'absolute')
+                    .style('top', '15px')
+                    .style('right', '15px')
+                    .style('display', 'flex')
+                    .style('gap', '15px')
+                    .style('z-index', '1000');
+
+                // Container for zoom controls
+                const zoomContainer = controlsContainer.append('div')
+                    .style('display', 'flex')
+                    .style('flex-direction', 'column')
+                    .style('background', 'white')
+                    .style('border-radius', '4px')
+                    .style('box-shadow', '0 1px 5px rgba(0,0,0,0.2)');
+
+                // Add zoom controls
+                const zoomControls = zoomContainer.append('div')
+                    .style('display', 'flex')
+                    .style('flex-direction', 'column');
+
+                // Add zoom in button
+                zoomControls.append('button')
+                    .html('+')
+                    .style('width', '30px')
+                    .style('height', '30px')
+                    .style('background', 'white')
+                    .style('border', '1px solid #ddd')
+                    .style('border-radius', '4px 4px 0 0')
+                    .style('cursor', 'pointer')
+                    .style('font-size', '16px')
+                    .style('color', '#555')
+                    .on('mouseover', function () { d3.select(this).style('background', '#f5f5f5'); })
+                    .on('mouseout', function () { d3.select(this).style('background', 'white'); })
+                    .on('click', () => svg.transition().call(zoom.scaleBy, 1.5));
+
+                // Add zoom out button
+                zoomControls.append('button')
+                    .html('−')
+                    .style('width', '30px')
+                    .style('height', '30px')
+                    .style('background', 'white')
+                    .style('border', '1px solid #ddd')
+                    .style('border-top', 'none')
+                    .style('border-radius', '0 0 4px 4px')
+                    .style('cursor', 'pointer')
+                    .style('font-size', '16px')
+                    .style('color', '#555')
+                    .on('mouseover', function () { d3.select(this).style('background', '#f5f5f5'); })
+                    .on('mouseout', function () { d3.select(this).style('background', 'white'); })
+                    .on('click', () => svg.transition().call(zoom.scaleBy, 0.75));
+
+                // Container for legend
+                const legendContainer = controlsContainer.append('div')
+                    .style('background', 'white')
+                    .style('border-radius', '4px')
+                    .style('box-shadow', '0 1px 5px rgba(0,0,0,0.2)')
+                    .style('padding', '5px 10px')
+                    .style('align-items', 'center')
+                    .style('gap', '10px');
+
+                // Add legend items
+                const legendItems = [
+                    { color: '#e74c3c', label: 'Coverage Area' },
+                    { color: '#e0e0e0', label: 'Other Area' }
+                ];
+
+                // Add legend items
+                legendContainer.selectAll('.legend-item')
+                    .data(legendItems)
+                    .enter()
+                    .append('div')
+                    .attr('class', 'legend-item')
+                    .style('display', 'flex')
+                    .style('align-items', 'center')
+                    .style('gap', '5px')
+                    .style('font-size', '12px')
+                    .style('padding', '2px 5px')
+                    .style('border-radius', '3px')
+                    .html(d => `
+                        <span style="display:inline-block; width:12px; height:12px; background:${d.color}; border:1px solid #ddd; border-radius:2px;"></span>
+                        <span>${d.label}</span>
+                    `);
+            })
+            .catch(function (error) {
+                console.error('Error loading map data:', error);
+                container.innerHTML =
+                    '<div class="alert alert-warning text-center">' +
+                    '<i class="fas fa-exclamation-triangle mb-2"></i><br>' +
+                    'Unable to load the map. Please check your internet connection and refresh the page.' +
+                    '</div>';
+            });
+    });
+</script>
+
+<style>
+    /* Map Container Specific Styles */
+    .org-item.map-container {
+        min-height: 500px;
+    }
+
+    .org-item.map-container .org-content.detailed {
+        max-height: none;
+        overflow: visible;
+    }
+
+    #nepal-map {
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        min-height: 300px;
+        padding: 50px 50px 50px 50px;
+    }
+
+    #nepal-map svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+    }
+
+    #nepal-map path {
+        transition: all 0.3s ease;
+    }
+
+    #nepal-map path:hover {
+        filter: drop-shadow(0 0 8px rgba(52, 152, 219, 0.8));
+    }
+
+    .map-legend {
+        margin: 20px 0;
+        padding: 5px;
+    }
+
+    .coverage-info {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .coverage-info h6 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 12px;
+        font-size: 1.1rem;
+    }
+
+    /* Responsive adjustments for map */
+    @media (max-width: 1200px) {
+        .org-item.map-container {
+            min-height: 550px;
+            padding: 2rem;
+        }
+
+        #nepal-map {
+            min-height: 650px;
+        }
+    }
+
+    .org-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .org-header h4 {
+        font-size: 1.1rem;
+        margin: 0;
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .org-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.3rem;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .org-icon.geographic {
+        background: linear-gradient(135deg, #20c997, #1aa179);
+        --item-color: #20c997;
+    }
+
+    @media (max-width: 768px) {
+        .org-item.map-container {
+            min-height: 600px;
+            padding: 1.5rem;
+        }
+
+        #nepal-map {
+            height: 500px !important;
+            min-height: 500px;
+            margin: 15px 0;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .org-item.map-container {
+            min-height: 550px;
+            padding: 1rem;
+        }
+
+        #nepal-map {
+            height: 450px !important;
+            min-height: 450px;
+        }
+
+        .coverage-info {
+            padding: 15px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .org-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .org-icon {
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .org-content.theme-list {
+            column-count: 1;
+        }
+    }
+
+    /* Animation Enhancement */
+    .wow {
+        visibility: hidden;
+    }
+
+    .wow.fadeInUp {
+        animation-name: fadeInUp;
+        animation-duration: 0.8s;
+        animation-fill-mode: both;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

@@ -1,0 +1,13 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Organizational Content</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {{ form.media }}
+        <button type="submit" class="btn btn-success">Save</button>
+    </form>
+</div>
+{% endblock %}

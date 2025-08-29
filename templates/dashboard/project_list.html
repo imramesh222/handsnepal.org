@@ -1,0 +1,66 @@
+{% extends "admin_base.html" %}
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Projects</h2>
+    <a href="{% url 'add_project' %}" class="btn btn-success">Add Project</a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Image</th>
+            <th>Attachment</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for project in projects %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ project.title }}</td>
+            <td>{{ project.get_status_display }}</td>
+            <td>
+                {% if project.image %}
+                    <img src="{{ project.image.url }}" width="100" alt="{{ project.title }}" class="img-thumbnail">
+                {% else %}
+                    <span class="text-muted">No image</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if project.attachment %}
+                    <a href="{{ project.attachment.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                {% else %}
+                    <span class="text-muted">No attachment</span>
+                {% endif %}
+            </td>
+            <td>
+                <span class="badge {% if project.status == 'ongoing' %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                    {{ project.get_status_display }}
+                </span>
+            </td>
+            <td>
+                <a href="{% url 'edit_project' project.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                <a href="{% url 'delete_project' project.pk %}" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

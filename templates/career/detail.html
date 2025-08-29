@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ career.title }} - Career Opportunity{% endblock %}
+
+{% block content %}
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5">
+    <div class="container py-5">
+        <h1 class="display-3 text-white mb-3 animated slideInDown">{{ career.title }}</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a class="text-white" href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a class="text-white" href="{% url 'career_list' %}">Careers</a></li>
+                <li class="breadcrumb-item text-white active" aria-current="page">{{ career.title|truncatewords:5 }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Career Detail Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-8">
+                <div class="mb-5">
+                    <h2 class="mb-4">{{ career.title }}</h2>
+                    <div class="d-flex mb-4">
+                        <div class="me-4">
+                            <p class="mb-2"><i class="far fa-calendar-alt text-primary me-2"></i> <strong>Posted on:</strong> {{ career.opening_date|date:"F d, Y" }}</p>
+                            <p class="mb-0"><i class="far fa-calendar-times text-primary me-2"></i> <strong>Apply before:</strong> {{ career.closing_date|date:"F d, Y" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="job-description mb-5">
+                        {{ career.description|safe }}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'career_apply' career.pk %}" class="btn btn-primary py-3 px-5">Apply Now</a>
+                        <a href="{% url 'career_list' %}" class="btn btn-outline-primary py-3 px-4">Back to Careers</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="bg-light rounded p-4 mb-4">
+                    <h4 class="mb-4">Job Summary</h4>
+                    <p><i class="far fa-calendar-alt text-primary me-2"></i><strong>Posted Date:</strong> {{ career.opening_date|date:"F d, Y" }}</p>
+                    <p><i class="far fa-calendar-times text-primary me-2"></i><strong>Deadline:</strong> {{ career.closing_date|date:"F d, Y" }}</p>
+                    <p><i class="far fa-clock text-primary me-2"></i><strong>Status:</strong> 
+                        {% if career.closing_date >= now.date %}
+                            <span class="text-success">Open</span>
+                        {% else %}
+                            <span class="text-danger">Closed</span>
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <div class="bg-light rounded p-4">
+                    <h4 class="mb-4">How to Apply</h4>
+                    <p>Interested candidates are requested to submit their application by clicking the "Apply Now" button below.</p>
+                    <a href="{% url 'admin_career_list' %}" class="btn btn-primary w-100 py-3">Apply Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Career Detail End -->
+{% endblock %}

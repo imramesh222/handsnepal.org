@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5">
+        <h1 class="display-3 text-white mb-3 animated slideInDown">Our Team</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a class="text-white" href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item text-primary active" aria-current="page">Our Team</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
+            <h1 class="display-6 mb-4">Our Expert Team Members</h1>
+        </div>
+        
+        {% if user.is_authenticated %}
+        <div class="text-end mb-4">
+            <a href="{% url 'team_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add Team Member
+            </a>
+        </div>
+        {% endif %}
+        
+        <div class="row g-4">
+            {% for member in teams %}
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="team-item">
+                    <div class="position-relative overflow-hidden">
+                        <img class="img-fluid" src="{{ member.photo.url }}" alt="{{ member.name }}" style="width: 100%; height: 400px; object-fit: cover;">
+                        <div class="team-social">
+                            {% if member.facebook %}
+                            <a class="btn btn-square btn-light rounded-circle mx-1" href="{{ member.facebook }}" target="_blank">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            {% endif %}
+                            {% if member.phone %}
+                            <a class="btn btn-square btn-light rounded-circle mx-1" href="tel:{{ member.phone }}">
+                                <i class="fas fa-phone"></i>
+                            </a>
+                            {% endif %}
+                            {% if member.email %}
+                            <a class="btn btn-square btn-light rounded-circle mx-1" href="mailto:{{ member.email }}">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="bg-light text-center p-4">
+                        <h5 class="mb-1">{{ member.name }}</h5>
+                        <p class="text-primary mb-0">{{ member.position }}</p>
+                        {% if user.is_authenticated %}
+                        <div class="mt-2">
+                            <a href="{% url 'team_update' member.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a href="{% url 'team_delete' member.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p>No team members found.</p>
+                {% if user.is_authenticated %}
+                <a href="{% url 'team_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add Your First Team Member
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.team-item {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.team-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.team-item img {
+    transition: transform 0.5s;
+}
+
+.team-item:hover img {
+    transform: scale(1.05);
+}
+
+.team-social {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.team-item:hover .team-social {
+    opacity: 1;
+}
+
+.team-social a {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
+    transition: all 0.3s;
+}
+
+.team-social a:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}

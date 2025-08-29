@@ -1,0 +1,759 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home - HANDS Nepal{% endblock %}
+
+{% block content %}
+<!-- Carousel Start -->
+<div class="container-fluid px-0 mb-5">
+  <div id="header-carousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      {% for item in carousel_items %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <img class="w-100 d-block" src="{{ item.image.url }}" alt="Image"
+          style="height: 600px; object-fit: cover; width: 100%;" loading="lazy">
+        <div class="carousel-caption">
+          <div class="container">
+            <div class="row justify-content-center">
+              <!-- Main Content -->
+              <div class="col-lg-6 col-12 text-start mb-4 mb-lg-0 d-flex align-items-center">
+                <h1 class="display-1 text-white mb-5 animated slideInRight" style="padding-top: 100px;">{{ item.title }}</h1>
+                <!-- <p class="fs-5 fw-medium text-uppercase animated slideInRight" style="color: #e41318;">{{ item.subtitle }}</p> -->
+                {% if item.button_text %}
+                <a href="{{ item.button_link }}" class="btn btn-danger py-3 px-5 animated slideInRight">{{
+                  item.button_text }}</a>
+                {% endif %}
+              </div>
+
+              <!-- Notices Section - Desktop -->
+              <div class="col-lg-4 d-none d-lg-flex align-items-center"
+                style="max-height: fit-content; overflow-y: auto; border-left: 4px solid #2ea01d;border-bottom: 4px solid #2ea01d;border-radius: 10px; padding: 0 !important; box-shadow: -15px 15px 40px rgba(156, 30, 30, 0.3), -10px 0 30px rgba(25, 73, 18, 0.6); background: white; position: relative; z-index: 1; margin-left: 20px; transform: translateX(-10px); ">
+                <div class="w-100">
+                  <div class="bg-white p-4 rounded-3 shadow-sm" style="border: 1px solid rgba(0,0,0,0.1);">
+                    <h3 class="elementor-heading-title elementor-size-default mb-3">Latest News</h3>
+
+                    {% if notices %}
+                    <div class="notice-scroll" style="max-height: 380px; overflow-y: auto;">
+                      {% for notice in notices %}
+                      <article class="post media-post clearfix mb-4 p-3 rounded-3"
+                        style="transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.05);">
+                        {% if notice.image %}
+                        <a class="post-thumb float-start me-3" href="#"
+                          style="width: 100px; height: 100px; overflow: hidden; border-radius: 8px;">
+                          <img src="{{ notice.image.url }}" class="img-fluid h-100 w-100 object-fit-cover"
+                            alt="{{ notice.title }}" style="border-radius: 6px;">
+                        </a>
+                        {% endif %}
+                        <div class="post-right">
+                          <div class="title-holder">
+                            <h6 class="entry-title mb-1">
+                              <a href="{% url 'notice_detail' notice.id %}"
+                                class="text-decoration-none text-dark fw-bold">
+                                {{ notice.title|truncatechars:60 }}
+                              </a>
+                            </h6>
+                          </div>
+                          <ul class="entry-meta list-inline mb-0">
+                            <li class="list-inline-item text-muted small">
+                              <i class="far fa-calendar me-1"></i>
+                              <time>{{ notice.published_at|date:"F j, Y" }}</time>
+                            </li>
+                          </ul>
+                          <div class="mt-2">
+                            <a href="{% url 'notice_detail' notice.id %}"
+                              class="text-danger text-decoration-none small">
+                              Read More <i class="fas fa-arrow-right ms-1 small"></i>
+                            </a>
+                          </div>
+                        </div>
+                      </article>
+                      <hr class="my-3">
+                      {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                      <a href="{% url 'notice_list' %}" class="btn btn-link text-danger text-decoration-none p-0">
+                        View All Notices <i class="fas fa-arrow-right ms-1 small"></i>
+                      </a>
+                    </div>
+                    {% else %}
+                    <div class="text-center p-4">
+                      <div class="text-muted py-4">
+                        <i class="fas fa-inbox fa-2x mb-3 text-muted"></i>
+                        <p class="mb-0">No notices available at the moment</p>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <!-- Notice Overlay -->
+              <div id="noticeOverlay" class="notice-overlay" style="display: none;">
+                <div class="notice-overlay-content">
+                  <div class="notice-overlay-header">
+                    <h6 id="noticeOverlayTitle"
+                      style="font-size: 0.9rem; width: 100%; text-align: justify; padding: 0 50px 0 20px; margin: 0; display: block;">
+                    </h6>
+                    <button type="button" class="btn-close"
+                      style="color: white;background-color: #eee; padding: 10px; border-radius: 10px; border: none; position: absolute; right: 10px; top: 10px;"
+                      id="closeNoticeOverlay"></button>
+                  </div>
+                  <div class="notice-overlay-body">
+                    <div class="notice-overlay-date mb-3">
+                      <small class="text-muted">
+                        <i class="far fa-calendar me-1"></i>
+                        <span id="noticeOverlayDate"></span>
+                      </small>
+                    </div>
+                    <div id="noticeOverlayContent" class="notice-content"></div>
+                  </div>
+                </div>
+              </div>
+
+              <style>
+                /* Notice Overlay Styles */
+                .notice-overlay {
+                  position: absolute;
+                  top: 50%;
+                  /* Space below navbar */
+                  left: 50%;
+                  transform: translateX(-50%);
+                  width: 90%;
+                  max-width: 1000px;
+                  max-height: calc(100vh - 100px);
+                  /* Account for navbar and spacing */
+                  background-color: rgba(249, 246, 246, 0.95);
+                  z-index: 99999;
+                  padding: 20px !important;
+                  margin: 0 auto;
+                  opacity: 0;
+                  visibility: hidden;
+                  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                  border-radius: 8px;
+                  border: 1px solid rgba(169, 49, 49, 0.2);
+                  box-shadow: 0 0 20px rgba(56, 10, 10, 0.2);
+                  overflow-y: auto;
+                }
+
+                /* Mobile styles */
+                @media (max-width: 767.98px) {
+                  .notice-overlay {
+                    width: 95%;
+                    max-width: 100%;
+                    top: 60px;
+                    max-height: calc(100vh - 80px);
+                    padding: 10px !important;
+                  }
+
+                  .notice-overlay-header {
+                    padding: 10px 15px;
+                  }
+
+                  .notice-overlay-header h3 {
+                    font-size: 0.8rem;
+                    margin-bottom: 5px;
+                  }
+
+                  .notice-overlay-header .date {
+                    font-size: 0.6rem;
+                  }
+
+                  .notice-content {
+                    font-size: 0.6rem;
+                    line-height: 1.4;
+                    padding: 10px 15px;
+                  }
+                }
+
+                /* Desktop styles */
+                @media (min-width: 768px) {
+                  .notice-overlay {
+                    width: 80%;
+                    max-width: 800px;
+                    top: 100px;
+                    max-height: calc(100vh - 120px);
+                  }
+                }
+
+                .notice-overlay.show {
+                  opacity: 1;
+                  visibility: visible;
+                  background-color: rgba(249, 246, 246, 0.7);
+                }
+
+                .notice-overlay-content {
+                  background: rgb(255, 255, 255);
+                  border-radius: 8px;
+                  max-width: 700px;
+                  width: 100%;
+                  max-height: 80vh;
+                  overflow-y: auto;
+                  box-shadow: 0 0 2px rgba(201, 5, 5, 0.2);
+                }
+
+                .notice-overlay-header {
+                  padding: 15px 20px;
+                  border-bottom: 1px solid #e0d9d9;
+                  display: flex;
+                  /* justify-content: space-between; */
+                  align-items: center;
+                  position: sticky;
+                  top: 0;
+                  background: rgb(229, 226, 226);
+                  z-index: 1;
+                }
+
+                .notice-overlay-body {
+                  padding: 20px 25px;
+                }
+
+                .notice-overlay-date {
+                  margin-bottom: 15px;
+                  color: #6c757d;
+                  font-size: 0.9rem;
+                }
+
+                .notice-content {
+                  line-height: 1.7;
+                  color: #333333;
+                  font-size: 0.7rem;
+                  text-align: left;
+                  /* padding: 0 5px; */
+                  max-height: 60vh;
+                  overflow-y: auto;
+                }
+
+                /* Custom scrollbar for notice content */
+                .notice-content::-webkit-scrollbar {
+                  width: 6px;
+                }
+
+                .notice-content::-webkit-scrollbar-track {
+                  background: #f1f1f1;
+                  border-radius: 3px;
+                }
+
+                .notice-content::-webkit-scrollbar-thumb {
+                  background: #e41318;
+                  border-radius: 3px;
+                }
+
+                .notice-content p {
+                  margin-bottom: 1rem;
+                }
+
+                .notice-content img {
+                  max-width: 100%;
+                  height: auto;
+                  margin: 10px 0;
+                }
+
+                .post-thumb {
+                  display: block;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                }
+
+                .post-thumb:hover {
+                  opacity: 0.9;
+                  transform: translateY(-2px);
+                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                }
+
+                .entry-title {
+                  font-size: 0.95rem;
+                  line-height: 1.4;
+                  margin-bottom: 0.5rem;
+                  transition: color 0.2s ease;
+                }
+
+                .entry-title a:hover {
+                  color: #e41318 !important;
+                }
+
+                .entry-meta {
+                  font-size: 0.8rem;
+                  color: #6c757d;
+                }
+
+                .media-post {
+                  display: flex;
+                  align-items: flex-start;
+                  transition: all 0.3s ease;
+                }
+
+                .media-post:hover {
+                  background-color: rgba(228, 19, 24, 0.02);
+                  border-color: rgba(228, 19, 24, 0.1) !important;
+                }
+
+                .post-right {
+                  flex: 1;
+                }
+              </style>
+
+              <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                  // Get all notice title links
+                  const noticeTitles = document.querySelectorAll('.notice-title');
+                  const noticeOverlay = document.getElementById('noticeOverlay');
+                  const closeButton = document.getElementById('closeNoticeOverlay');
+
+                  // Close overlay when clicking close button or outside content
+                  closeButton.addEventListener('click', closeOverlay);
+                  noticeOverlay.addEventListener('click', function (e) {
+                    if (e.target === noticeOverlay) {
+                      closeOverlay();
+                    }
+                  });
+
+                  // Close overlay with Escape key
+                  document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') {
+                      closeOverlay();
+                    }
+                  });
+
+                  function closeOverlay() {
+                    noticeOverlay.classList.remove('show');
+                    setTimeout(() => {
+                      noticeOverlay.style.display = 'none';
+                      // Clear previous content when closing
+                      document.getElementById('noticeOverlayTitle').textContent = '';
+                      document.getElementById('noticeOverlayDate').textContent = '';
+                      document.getElementById('noticeOverlayContent').innerHTML = '';
+                    }, 400); // Match this with the transition duration
+                    document.body.style.overflow = 'auto';
+                  }
+
+                  // Add click event to all notice titles
+                  noticeTitles.forEach(title => {
+                    title.addEventListener('click', function (e) {
+                      e.preventDefault();
+                      const noticeId = this.getAttribute('data-notice-id');
+                      // Navigate to the notice detail page
+                      window.location.href = `/notice/${noticeId}/`;
+                    });
+                  });
+                });
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#header-carousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+  <!-- Mobile Notices Section -->
+  <div class="d-lg-none px-3 py-4">
+    <div class="bg-white p-4 rounded-3 shadow-sm" style="border: 1px solid rgba(0,0,0,0.1);">
+      <h3 class="elementor-heading-title elementor-size-default mb-3 text-center">Latest News and Notices</h3>
+      {% if notices %}
+      <div class="notice-scroll" style="max-height: 400px; overflow-y: auto;">
+        {% for notice in notices|slice:":3" %}
+        <article class="post media-post clearfix mb-3 p-3 rounded-3"
+          style="transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.05);">
+          {% if notice.image %}
+          <a class="post-thumb float-start me-3" href="#"
+            style="width: 70px; height: 70px; overflow: hidden; border-radius: 6px;">
+            <img src="{{ notice.image.url }}" class="img-fluid h-100 w-100 object-fit-cover" alt="{{ notice.title }}"
+              style="border-radius: 4px;">
+          </a>
+          {% endif %}
+          <div class="post-right">
+            <div class="title-holder">
+              <h6 class="entry-title mb-1">
+                <a href="#" class="text-decoration-none text-dark fw-bold notice-title"
+                  data-notice-id="{{ notice.id }}">
+                  {{ notice.title|truncatechars:60 }}
+                </a>
+              </h6>
+              </h6>
+            </div>
+            <ul class="entry-meta list-inline mb-0">
+              <li class="list-inline-item text-muted small">
+                <i class="far fa-calendar me-1"></i>
+                <time>{{ notice.published_at|date:"F j, Y" }}</time>
+              </li>
+            </ul>
+            <div class="mt-1">
+              <a href="#" class="text-danger text-decoration-none small notice-title" data-notice-id="{{ notice.id }}">
+                Read More <i class="fas fa-arrow-right ms-1 small"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+        {% if not forloop.last %}
+        <hr class="my-2">{% endif %}
+        {% endfor %}
+      </div>
+      <div class="text-center mt-3">
+        <a href="{% url 'notice_list' %}" class="btn btn-link text-danger text-decoration-none p-0">
+          View All Notices <i class="fas fa-arrow-right ms-1 small"></i>
+        </a>
+      </div>
+      {% else %}
+      <div class="text-center p-3">
+        <div class="text-muted py-2">
+          <i class="fas fa-inbox fa-2x mb-2 text-muted"></i>
+          <p class="mb-0 small">No notices available at the moment</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<!-- Carousel End -->
+
+<!-- About Section -->
+<div class="container-xxl py-5">
+  <div class="container">
+    <div class="row g-5 align-items-center wow fadeInUp" data-wow-delay="0.1s">
+      <!-- Single Image -->
+      <div class="col-lg-6 mx-auto">
+        <div class="overflow-hidden rounded shadow-sm">
+          <img src="{{ about_images.0.image.url }}" class="w-100 h-auto object-fit-cover" alt="About Image"
+            style="max-height: 450px;">
+        </div>
+      </div>
+
+      <!-- Text Content -->
+      <div class="col-lg-6">
+        <p class="fw-medium text-uppercase text-danger mb-2">About Us</p>
+        <h1 class="display-5 mb-3">{{ about_info.heading }}</h1>
+        <!-- <h4 class="text-secondary mb-4">Our Mission & Vision</h4> -->
+        <p class="mb-4" style="text-align: justify; text-align-last: justify; hyphens: auto; word-spacing: -0.05em;">
+          {{ about_info.description|truncatewords:150 }}
+          <a href="{% url 'about' %}#about" class="text-primary text-decoration-none">Read More</a>
+        </p>
+
+
+      </div>
+    </div>
+  </div>
+  {% include "coverage.html" %}
+
+</div>
+<!-- About End -->
+
+<!-- Coverage Start< -->
+
+<!-- Coverage End -->
+
+<!-- Governance Section -->
+<div class="container-xxl py-5">
+  <div class="container">
+    <div class="org-item">
+      <div class="org-header d-flex justify-content-between align-items-center mb-4">
+    <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
+      <p class="fw-medium text-uppercase mb-2" style="color: #e41318;">Governance</p>
+      <h1 class="display-5 mb-5">Governance</h1>
+    </div>
+        <!-- Governance Button -->
+        <a href="{% url 'governance' %}" class="btn btn-primary btn-sm rounded-pill">
+          View Governance
+        </a>
+      </div>
+
+      <div class="row g-4 justify-content-center">
+        {% for gov in governance %}
+        <div class="col-6 col-md-4 col-lg-3 d-flex">
+          <div class="team-card h-100 d-flex flex-column w-100">
+            <div class="team-img-container text-center p-3">
+              <img class="img-fluid rounded-circle mb-3" 
+                   src="{{ gov.photo.url }}" 
+                   alt="{{ gov.name }}" 
+                   style="width: 160px; height: 160px; object-fit: cover; border: 5px solid #f8f9fa; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);">
+            </div>
+            <div class="team-info p-3 text-center flex-grow-1 d-flex flex-column">
+              <div>
+                <h5 class="mb-1 fw-bold">{{ gov.name }}</h5>
+                <p class="text-primary mb-2 fw-semibold">{{ gov.position }}</p>
+                {% if gov.expertise %}
+                <p class="text-muted small mb-2">
+                  <i class="fas fa-lightbulb me-1"></i> {{ gov.expertise }}
+                </p>
+                {% endif %}
+                {% if gov.phone %}
+                <p class="mb-0">
+                  <i class="fas fa-phone-alt me-1 text-success"></i> {{ gov.phone }}
+                </p>
+                {% endif %}
+              </div>
+              <div class="mt-auto pt-3">
+                {% if gov.email %}
+                <a href="mailto:{{ gov.email }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                  <i class="fas fa-envelope me-1"></i> Email
+                </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> Governance information will be updated soon!
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Notices Section -->
+<div class="container-xxl py-5" style="background-color:whitesmoke;">
+  <div class="container">
+    <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
+      <p class="fw-medium text-uppercase mb-2" style="color: #e41318;">Notices</p>
+      <h1 class="display-5 mb-5">Latest Updates</h1>
+    </div>
+
+    {% if notices %}
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <tbody>
+              {% for notice in notices %}
+              <tr class="notice-row" data-bs-toggle="collapse" data-bs-target="#noticeContent{{ notice.id }}"
+                aria-expanded="false" aria-controls="noticeContent{{ notice.id }}">
+                <td class="w-25">
+                  <div class="d-flex align-items-center">
+                    <div class="me-3 text-center" style="min-width: 60px;">
+                      <div class="fw-bold text-danger">{{ notice.published_at|date:"d" }}</div>
+                      <div class="text-muted small">{{ notice.published_at|date:"M Y" }}</div>
+                    </div>
+                    <div class="fw-bold">{{ notice.title }}</div>
+                  <!-- <i class="fas fa-chevron-down"></i> -->
+                  </div>
+                </td>
+                <!-- <td class="text-end">
+                  <i class="fas fa-chevron-down"></i>
+                </td> -->
+              </tr>
+              <tr>
+                <td colspan="2" class="p-0">
+                  <div class="collapse" id="noticeContent{{ notice.id }}">
+                    <div class="p-3 bg-white">
+                      <div class="mb-3">{{ notice.content|safe }}</div>
+                      {% if notice.attachment %}
+                      <div>
+                        <a href="{{ notice.attachment.url }}" class="btn btn-sm btn-danger" download>
+                          <i class="fas fa-download me-2"></i>Download Attachment
+                        </a>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="text-center py-4">
+      <p class="text-muted">No Publication available at the moment.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+<!-- Notices End -->
+
+
+<!-- Partners Section -->
+<div class="container-xxl py-5">
+  <div class="container text-center">
+    <p class="fw-medium text-uppercase text-danger mb-2">Our Partners</p>
+    
+    <!-- Present Partners -->
+    {% if present_clients %}
+    <h2 class="h3 mb-4">Our Current Partners</h2>
+    <div class="row g-4 justify-content-center align-items-center mb-5">
+      {% for client in present_clients %}
+      <div class="col-6 col-md-3 d-flex justify-content-center align-items-center">
+        {% if client.website %}
+        <a href="{{ client.website }}" target="_blank" rel="noopener" class="d-block"
+          style="max-height: 100px; max-width: 180px;">
+          <img src="{{ client.logo.url }}" alt="{{ client.name }}" class="img-fluid grayscale-hover"
+            style="max-height: 100px; width: auto;" loading="lazy">
+        </a>
+        {% else %}
+        <div style="max-height: 100px; max-width: 180px;">
+          <img src="{{ client.logo.url }}" alt="{{ client.name }}" class="img-fluid grayscale-hover"
+            style="max-height: 100px; width: auto;" loading="lazy">
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Past Partners -->
+    {% if past_clients %}
+    <h2 class="h3 mb-4">Our Past Partners</h2>
+    <div class="row g-4 justify-content-center align-items-center">
+      {% for client in past_clients %}
+      <div class="col-6 col-md-3 d-flex justify-content-center align-items-center">
+        {% if client.website %}
+        <a href="{{ client.website }}" target="_blank" rel="noopener" class="d-block"
+          style="max-height: 100px; max-width: 180px; opacity: 0.7;">
+          <img src="{{ client.logo.url }}" alt="{{ client.name }}" class="img-fluid grayscale"
+            style="max-height: 100px; width: auto;" loading="lazy">
+        </a>
+        {% else %}
+        <div style="max-height: 100px; max-width: 180px; opacity: 0.7;">
+          <img src="{{ client.logo.url }}" alt="{{ client.name }}" class="img-fluid grayscale"
+            style="max-height: 100px; width: auto;" loading="lazy">
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+  </div>
+</div>
+<!-- Partners End -->
+<style>
+  /* Notice Cards */
+  .notice-card {
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .notice-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .notice-header {
+    padding: 20px;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .notice-date {
+    background: white;
+    color: #1e3c72;
+    border-radius: 6px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: bold;
+  }
+
+  .notice-date .day {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .notice-date .month {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+  }
+
+  .notice-title {
+    margin: 0;
+    font-size: 1.1rem;
+    flex-grow: 1;
+    color: #fff;
+  }
+
+  .notice-body {
+    padding: 20px;
+  }
+
+  .notice-body p {
+    color: #555;
+    margin-bottom: 15px;
+  }
+
+  .notice-footer {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+  }
+
+  @media (max-width: 767.98px) {
+    .notice-header {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .notice-date {
+      margin-bottom: 15px;
+    }
+  }
+</style>
+<!-- Clients Section -->
+<!--<div class="container-xxl py-5">-->
+<!--  <div class="container text-center">-->
+<!--    <p class="fw-medium text-uppercase text-danger mb-2">Our Clients & Partners</p>-->
+<!--    <h1 class="display-5 mb-5">Trusted By</h1>-->
+<!--    <div class="row g-4 justify-content-center align-items-center">-->
+<!--      {% for client in clients %}-->
+<!--      <div class="col-6 col-md-3 d-flex justify-content-center align-items-center">-->
+<!--        {% if client.website %}-->
+<!--          <a href="{{ client.website }}" target="_blank" rel="noopener" class="d-block" style="max-height: 100px; max-width: 180px;">-->
+<!--            <img -->
+<!--              src="{{ client.logo.url }}" -->
+<!--              alt="{{ client.name }}" -->
+<!--              class="img-fluid grayscale-hover" -->
+<!--              style="max-height: 100px; width: auto;"-->
+<!--              loading="lazy"-->
+<!--            >-->
+<!--          </a>-->
+<!--        {% else %}-->
+<!--          <div style="max-height: 100px; max-width: 180px;">-->
+<!--            <img -->
+<!--              src="{{ client.logo.url }}" -->
+<!--              alt="{{ client.name }}" -->
+<!--              class="img-fluid grayscale-hover" -->
+<!--              style="max-height: 100px; width: auto;"-->
+<!--              loading="lazy"-->
+<!--            >-->
+<!--          </div>-->
+<!--        {% endif %}-->
+<!--      </div>-->
+<!--      {% endfor %}-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+<!-- Clients End -->
+
+<style>
+  .grayscale-hover {
+    filter: grayscale(100%);
+    transition: filter 0.3s ease;
+  }
+
+  .grayscale-hover:hover {
+    filter: grayscale(0%);
+  }
+</style>
+
+{% endblock %}

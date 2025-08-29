@@ -1,0 +1,52 @@
+{% extends "admin_base.html" %}
+{% block title %}Organization Details{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Organization Details</h2>
+    {% if organizationdetails.count == 0 %}
+        <a href="{% url 'add_organizationdetail' %}" class="btn btn-success">Add Organization Details</a>
+    {% endif %}
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>Site Title</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in organizationdetails %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.site_title }}</td>
+                <td>{{ item.address }}</td>
+                <td>{{ item.phone }}</td>
+                <td>{{ item.email }}</td>
+                <td>
+                    <a href="{% url 'edit_organizationdetail' item.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_organizationdetail' item.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No organization details added yet.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

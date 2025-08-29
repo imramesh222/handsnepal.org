@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <!-- Main Service Detail -->
+    <div class="col-lg-8">
+      <h1 class="mb-2">{{ service.title }}</h1>
+     
+      {% if service.short_description %}
+        <p class="text-muted fst-italic mb-3">{{ service.short_description }}</p>
+      {% endif %}
+     
+      <img
+        src="{{ service.image.url }}"
+        class="img-fluid rounded mb-4"
+        alt="{{ service.title }}"
+        style="max-height: 450px; object-fit: cover; width: 100%;"
+      >
+      <p class="lead">{{ service.description }}</p>
+    </div>
+
+    <!-- Related Services Sidebar -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Related Services</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for related in related_services %}
+            <li class="list-group-item">
+              <a href="{% url 'service_detail' related.slug %}" class="text-decoration-none text-dark d-block py-2"
+                 style="transition: color 0.3s;">
+                <strong>{{ related.title }}</strong><br>
+                <small class="text-muted">{{ related.short_description|truncatewords:15 }}</small>
+              </a>
+            </li>
+          {% empty %}
+            <li class="list-group-item text-muted">No related services found.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

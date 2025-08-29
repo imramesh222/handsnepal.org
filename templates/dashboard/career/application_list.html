@@ -1,0 +1,204 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Career Applications</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Career Applications</li>
+    </ol>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Applications List
+            <div class="float-end">
+                <span class="badge bg-primary">Total: {{ total_applications }}</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Search and Filter -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <form method="get" class="d-flex">
+                        <input class="form-control me-2" type="text" name="q" value="{{ search_query }}" placeholder="Search applications...">
+                        <button class="btn btn-outline-primary" type="submit">Search</button>
+                    </form>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="btn-group" role="group">
+                        <a href="?view_status=" class="btn btn-outline-secondary {% if not view_status %}active{% endif %}">All</a>
+                        <a href="?view_status=viewed" class="btn btn-outline-secondary {% if view_status == 'viewed' %}active{% endif %}">Viewed</a>
+                        <a href="?view_status=unviewed" class="btn btn-outline-secondary {% if view_status == 'unviewed' %}active{% endif %}">Unviewed</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Applications Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Applied On</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                        <tr class="{% if not application.is_viewed %}table-warning{% endif %}">
+                            <td>{{ application.full_name }}</td>
+                            <td>{{ application.career.title }}</td>
+                            <td>{{ application.email }}</td>
+                            <td>{{ application.phone }}</td>
+                            <td>{{ application.applied_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                {% if application.is_viewed %}
+                                    <span class="badge bg-success">Viewed</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">New</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#applicationModal{{ application.id }}">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a href="{{ application.resume.url }}" class="btn btn-sm btn-primary" target="_blank">
+                                    <i class="fas fa-download"></i> Resume
+                                </a>
+                            </td>
+                        </tr>
+                        
+                        <!-- Application Details Modal -->
+                        <div class="modal fade" id="applicationModal{{ application.id }}" tabindex="-1" aria-labelledby="applicationModalLabel{{ application.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="applicationModalLabel{{ application.id }}">
+                                            Application Details - {{ application.full_name }}
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <h6>Personal Information</h6>
+                                                <p>
+                                                    <strong>Name:</strong> {{ application.full_name }}<br>
+                                                    <strong>Email:</strong> {{ application.email }}<br>
+                                                    <strong>Phone:</strong> {{ application.phone }}<br>
+                                                    <strong>Applied for:</strong> {{ application.career.title }}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>Application Details</h6>
+                                                <p>
+                                                    <strong>Applied On:</strong> {{ application.applied_at|date:"M d, Y H:i" }}<br>
+                                                    <strong>Status:</strong> 
+                                                    {% if application.is_viewed %}
+                                                        <span class="text-success">Viewed</span>
+                                                    {% else %}
+                                                        <span class="text-warning">New</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        {% if application.message %}
+                                        <div class="mb-4">
+                                            <h6>Message from Applicant</h6>
+                                            <div class="p-3 bg-light rounded">
+                                                {{ application.message|linebreaks }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <div class="mt-4">
+                                            <a href="{{ application.resume.url }}" class="btn btn-primary" target="_blank">
+                                                <i class="fas fa-download me-2"></i>Download Resume
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        {% if not application.is_viewed %}
+                                        <a href="#" class="btn btn-success mark-as-viewed" data-application-id="{{ application.id }}">
+                                            Mark as Viewed
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">No applications found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if applications.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if applications.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ applications.previous_page_number }}">Previous</a></li>
+                    {% endif %}
+                    
+                    {% for num in applications.paginator.page_range %}
+                        {% if applications.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if view_status %}&view_status={{ view_status }}{% endif %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if applications.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ applications.next_page_number }}">Next</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ applications.paginator.num_pages }}">Last &raquo;</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- AJAX for marking as viewed -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Mark application as viewed when modal is shown
+    $('.modal').on('shown.bs.modal', function (e) {
+        var modal = $(this);
+        var applicationId = modal.attr('id').replace('applicationModal', '');
+        
+        // Only mark as viewed if not already viewed
+        if (!modal.find('.modal-footer .btn-success').hasClass('d-none')) {
+            $.ajax({
+                url: '/dashboard/careers/applications/' + applicationId + '/mark-viewed/',
+                method: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        modal.find('.modal-footer .btn-success').addClass('d-none');
+                        modal.find('.modal-body .badge').removeClass('bg-warning text-dark').addClass('bg-success').text('Viewed');
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

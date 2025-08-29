@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5">
+        <h1 class="display-3 text-white animated slideInRight">Photo Gallery</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb animated slideInRight mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Photo Gallery</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Gallery Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
+            <h2 class="text-uppercase">Our Moments</h2>
+            <p class="mb-4">Captured memories from our events and activities</p>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Filter Buttons -->
+            <!-- <div class="col-12 text-center mb-4 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary active" data-filter="all">All</button>
+                    <button type="button" class="btn btn-primary" data-filter=".event">Events</button>
+                    <button type="button" class="btn btn-primary" data-filter=".activity">Activities</button>
+                    <button type="button" class="btn btn-primary" data-filter=".team">Team</button>
+                </div>
+            </div> -->
+            
+            <!-- Gallery Items -->
+            <div class="row gallery-container wow fadeInUp" data-wow-delay="0.5s">
+                {% for photo in photos %}
+                <div class="col-lg-4 col-md-6 mb-4 gallery-item event">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <a href="{{ photo.image.url }}" data-lightbox="gallery" data-title="{{ photo.title }}">
+                            <img src="{{ photo.image.url }}" class="card-img-top img-fluid" alt="{{ photo.title }}">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ photo.title }}</h5>
+                            <p class="card-text text-muted small">{{ photo.created_at|date:"F j, Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <h4 class="text-muted">No photos available yet. Check back soon!</h4>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if photos.has_other_pages %}
+            <div class="col-12 wow fadeInUp" data-wow-delay="0.7s">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if photos.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ photos.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for i in photos.paginator.page_range %}
+                        <li class="page-item {% if photos.number == i %}active{% endif %}">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        
+                        {% if photos.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ photos.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- Gallery End -->
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Lightbox CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
+
+<!-- Isotope Filtering -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js"></script>
+
+<script>
+$(document).ready(function(){
+    // Initialize lightbox
+    $('[data-lightbox]').lightbox();
+    
+    // Initialize Isotope
+    var $grid = $('.gallery-container').isotope({
+        itemSelector: '.gallery-item',
+        layoutMode: 'fitRows'
+    });
+    
+    // Filter items on button click
+    $('.btn-group').on('click', 'button', function(){
+        var filterValue = $(this).attr('data-filter');
+        $grid.isotope({ filter: filterValue });
+        $('.btn-group button').removeClass('active');
+        $(this).addClass('active');
+    });
+});
+</script>
+{% endblock %}

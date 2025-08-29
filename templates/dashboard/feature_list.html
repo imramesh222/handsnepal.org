@@ -1,0 +1,44 @@
+{% extends "admin_base.html" %}
+{% block title %}Features{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Features</h2>
+    <a href="{% url 'add_feature' %}" class="btn btn-success">Add Feature</a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>Icon Class</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for feature in features %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ feature.icon_class }}</td>
+                <td>{{ feature.title }}</td>
+                <td>{{ feature.description|linebreaksbr }}</td>
+                <td>
+                    <a href="{% url 'edit_feature' feature.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_feature' feature.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
