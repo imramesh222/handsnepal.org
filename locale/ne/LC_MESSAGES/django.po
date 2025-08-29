@@ -1,15 +1,18 @@
-# Nepali translations for HANDS Nepal project.
-# Copyright (C) 2025 HANDS Nepal
-# This file is distributed under the same license as the HANDS Nepal project.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 1.0\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-29 17:07+0545\n"
-"PO-Revision-Date: 2025-08-29 17:30+0545\n"
-"Last-Translator: HANDS Nepal Team <info@handsnepal.org>\n"
-"Language: ne\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,7 +20,7 @@ msgstr ""
 
 #: hydro_site/settings.py:134
 msgid "English"
-msgstr "अंग्रेजी"
+msgstr ""
 
 #: hydro_site/settings.py:135
 msgid "नेपाली"
@@ -25,22 +28,22 @@ msgstr ""
 
 #: templates/partials/language_switcher.html:5
 msgid "Select language"
-msgstr "भाषा चयन गर्नुहोस्"
+msgstr ""
 
 #: templates/partials/language_switcher.html:19
 msgid "Language options"
-msgstr "भाषा विकल्पहरू"
+msgstr ""
 
 #: templates/partials/language_switcher.html:32
 #: templates/partials/language_switcher.html:43
 #, python-format
 msgid "Switch to %(language)s"
-msgstr "%(language)s मा परिवर्तन गर्नुहोस्"
+msgstr ""
 
 #: templates/partials/language_switcher.html:34
 #: templates/partials/language_switcher.html:45
 msgid "(current)"
-msgstr "(हालको)"
+msgstr ""
 
 #: venv/lib/python3.13/site-packages/ckeditor_uploader/forms.py:6
 msgid "Search files"
