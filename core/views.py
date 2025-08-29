@@ -73,9 +73,10 @@ def about(request):
     context = {
         'about_images': AboutImage.objects.all(),
         'about_info': AboutInfo.objects.first(),
-        
         'organization_content': OrganizationContent.objects.first(),
         'teams': TeamMember.objects.all().order_by('name'),
+        'key_info': KeyInfo.objects.all(),
+        'governance': Governance.objects.all(),
     }
     return render(request, 'about.html', context)
 

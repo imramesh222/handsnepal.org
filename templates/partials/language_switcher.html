@@ -4,11 +4,14 @@
 <div class="language-switcher">
     <button class="language-button" id="languageToggle" aria-haspopup="true" aria-expanded="false" aria-label="{% trans 'Select language' %}">
         <i class="bi bi-globe-americas" aria-hidden="true"></i>
-        <span class="current-language">
+        <span class="current-language" lang="{{ current_lang|default:'en' }}">
             {% get_current_language as current_lang %}
-            {% for code, name in LANGUAGES %}
-                {% if code == current_lang %}{% get_language_info for code as lang %}{{ lang.name_local }}{% endif %}
-            {% endfor %}
+            {% if current_lang %}
+                {% get_language_info for current_lang as lang %}
+                {{ lang.name_local }}
+            {% else %}
+                English
+            {% endif %}
         </span>
         <i class="bi bi-chevron-down" aria-hidden="true"></i>
     </button>
@@ -27,7 +30,7 @@
                    aria-checked="{% if code == CURRENT_LANGUAGE %}true{% else %}false{% endif %}"
                    hreflang="{{ code }}"
                    title="{% blocktranslate with language=name %}Switch to {{ language }}{% endblocktranslate %}">
-                    <span class="language-name">{{ lang.name_local }}</span>
+                    <span class="language-name" data-lang="{{ code }}">{{ lang.name_local }}</span>
                     {% if code == CURRENT_LANGUAGE %}<span class="visually-hidden">{% trans '(current)' %}</span>{% endif %}
                 </a>
             {% else %}
@@ -38,7 +41,7 @@
                    aria-checked="{% if code == CURRENT_LANGUAGE %}true{% else %}false{% endif %}"
                    hreflang="{{ code }}"
                    title="{% blocktranslate with language=name %}Switch to {{ language }}{% endblocktranslate %}">
-                    <span class="language-name">{{ lang.name_local }}</span>
+                    <span class="language-name" data-lang="{{ code }}">{{ lang.name_local }}</span>
                     {% if code == CURRENT_LANGUAGE %}<span class="visually-hidden">{% trans '(current)' %}</span>{% endif %}
                 </a>
             {% endif %}

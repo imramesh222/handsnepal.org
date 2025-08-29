@@ -13,9 +13,9 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Rubik:wght@500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/earlyaccess/lohitdevanagari.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     <!-- Icon Fonts -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
@@ -72,7 +72,7 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             min-width: 140px;
             z-index: 1000;
-            overflow: hidden;
+            /* overflow: hidden; */
         }
 
         .language-dropdown.show {
@@ -521,7 +521,7 @@
     <div class="container-fluid px-0" style="background-color: #1947a0;">
         <div class="row g-0 position-relative">
             <!-- Follow Us - Hidden on mobile, shows on lg and up -->
-            <div class="col-12 col-lg-6 ps-3 ps-lg-5 text-start d-none d-lg-flex py-1"
+            <div class="col-12 col-lg-5 ps-3 ps-lg-5 text-start d-none d-lg-flex py-1"
                 style="background-color: #1947a0;">
                 <div class="h-100 d-inline-flex align-items-center text-white">
                     {% if org_details.facebook %}<a class="btn btn-link text-light" href="{{ org_details.facebook }}"><i
@@ -539,7 +539,7 @@
             </div>
 
             <!-- Phone Section - 3 columns on lg+ -->
-            <div class="col-12 col-lg-6 text-center text-lg-end p-0 ms-auto" style="background-color: #e41318;">
+            <div class="col-12 col-lg-7 text-center text-lg-end p-0 ms-auto" style="background-color: #e41318;">
                 <div class="h-100 topbar-right d-flex align-items-center justify-content-end text-white py-2 pe-3">
                     <div class="motto-item motto-nepali d-flex align-items-center me-3">
                         <div> "सम्मानित र समृद्ध जीवनका लागि सामुदायिक शसक्तिकरण" </div>
@@ -754,12 +754,15 @@
     <!-- Copyright -->
     <div class="container-fluid copyright bg-dark py-4">
         <div class="container text-center">
-            <span class="mb-2"> <a class="fw-semi-bold" style="color:white" href="#">{% if org_details %}{{
-                    org_details.site_title }}{% else %}HandsNepal{% endif %}</a>. All Rights Reserved.</span>
+            <span class="mb-2"> <a class="fw-semi-bold" style="color:white" href="#">{% if org_details %}{{ org_details.site_title }}{% else %}HandsNepal{% endif %}</a>. All Rights Reserved.</span>
             <span class="mb-0 ps-3">Design by <a class="fw-semi-bold" style="color:white"
                     href="https://www.kitwosd.com/" target="_blank" rel="noopener noreferrer">Kitwosd IT Support
                     Center</a></span>
+            <a href="#" target="_blank" rel="noopener" class="btn policy-btn" style="background-color: #e41318; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none; display: inline-block;">
+                Privacy Policy
+            </a>
         </div>
+        
     </div>
 
     <!-- Back to Top Button -->

@@ -252,6 +252,7 @@ class OrganizationContent(models.Model):
     value = RichTextField(verbose_name="Organizational Value Description")
     geo_area = RichTextField(verbose_name="Geographical Area Description")
     theme_area = RichTextField(verbose_name="Thematic Area Description")
+    
 
     def __str__(self):
         return "Organizational Content"    
